@@ -28,6 +28,27 @@ async function main() {
     console.log('⏭️  Super Admin already exists — skipping')
   }
 
+  // ── Test Admin ──────────────────────────────────
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: 'admin@dscacontracting.com' }
+  })
+
+  if (!existingAdmin) {
+    const adminHash = await bcrypt.hash('Admin@1234', 12)
+    await prisma.user.create({
+      data: {
+        name: 'Test Admin',
+        email: 'admin@dscacontracting.com',
+        password: adminHash,
+        role: 'ADMIN',
+        active: true
+      }
+    })
+    console.log('✅ Test Admin created')
+  } else {
+    console.log('⏭️  Test Admin already exists — skipping')
+  }
+
   // ── Laptop assets ─────────────────────────────
   const laptops = Array.from({ length: 1000 }, (_, index) => ({
     assetCode: `DSCA-IT-L-${String(index + 1).padStart(3, '0')}`,

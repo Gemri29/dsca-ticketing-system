@@ -511,7 +511,7 @@ These are explicitly excluded from the first version to keep scope manageable:
 | **Phase 3** | UI/UX Wireframes ✅ |
 | **Phase 4** | Dev Environment Setup (repo, tooling, env vars) ✅ |
 | **Phase 5** | Backend — DB schema, API routes, auth, email ✅ |
-| **Phase 6** | Frontend — Landing page, ticket form, track ticket |
+| **Phase 6** | Frontend — Landing page, ticket form, track ticket ✅|
 | **Phase 7** | Frontend — Admin portal (dashboard, inbox, detail view) |
 | **Phase 8** | Frontend — Super Admin portal (analytics, admin mgmt) |
 | **Phase 9** | Testing (unit, integration, UAT) |
