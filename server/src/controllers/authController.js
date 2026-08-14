@@ -95,7 +95,7 @@ export const updateMe = async (req, res) => {
 
     if (email?.trim()) {
       const domain = email.split('@')[1]
-      const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS?.split(',') || ['dscacontacting.com']
+      const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS?.split(',') || ['dscacontracting.com']
       if (!allowedDomains.includes(domain)) {
         return res.status(400).json({ success: false, message: 'Email domain not allowed.' })
       }

@@ -11,7 +11,9 @@ model Ticket {
   ticketCode   String   @unique
   fullName     String
   email        String
-  laptopNumber String
+  laptopNumber  String?
+  desktopNumber String?
+  siteName      String
   issueType    String
   customIssue  String?
   priority     Priority @default(MEDIUM)
@@ -38,6 +40,14 @@ model User {
 }
 
 model Laptop {
+  id           String   @id @default(cuid())
+  assetCode    String   @unique
+  assignedTo   String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Desktop {
   id           String   @id @default(cuid())
   assetCode    String   @unique
   assignedTo   String?

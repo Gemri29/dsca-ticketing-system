@@ -1,0 +1,256 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{background:#f7f8fa;font-family:var(--font-sans);color:#1a1a1a;display:flex;flex-direction:column;min-height:700px}
+.topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.logo i{font-size:18px;color:#2563eb}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#2563eb}
+.admin-name{font-size:13px;color:#555}
+.notif{position:relative;cursor:pointer}
+.notif i{font-size:18px;color:#888}
+.notif-dot{position:absolute;top:0;right:0;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid #fff}
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;flex-shrink:0;transition:width 0.2s}
+.sidebar.collapsed{width:52px}
+.sb-toggle{display:flex;align-items:center;justify-content:flex-end;padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.sb-toggle button{background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;padding:2px}
+.sb-section{padding:8px 0}
+.sb-label{font-size:10px;font-weight:500;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;padding:6px 16px 4px;white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .sb-label{opacity:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-radius:0;color:#666;font-size:13px;white-space:nowrap;overflow:hidden;border-left:3px solid transparent}
+.sb-item:hover{background:#f7f8fa;color:#1a1a1a}
+.sb-item.active{background:#eff6ff;color:#2563eb;border-left-color:#2563eb}
+.sb-item i{font-size:17px;flex-shrink:0}
+.sb-item span{overflow:hidden;transition:opacity 0.15s}
+.sidebar.collapsed .sb-item span{opacity:0;width:0}
+.sb-sub{padding-left:43px;font-size:12px;color:#888;display:flex;flex-direction:column;gap:1px}
+.sidebar.collapsed .sb-sub{display:none}
+.sb-sub-item{padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.sb-sub-item:hover{background:#f0f4ff;color:#2563eb}
+.sb-sub-item.active{color:#2563eb;font-weight:500}
+.sb-count{font-size:10px;background:#f3f4f6;color:#888;padding:1px 6px;border-radius:10px}
+.sb-count.orange{background:#fff7ed;color:#ea580c}
+.sb-count.blue{background:#eff6ff;color:#2563eb}
+.sb-count.green{background:#f0fdf4;color:#16a34a}
+.sb-footer{margin-top:auto;border-top:1px solid #f0f0f0;padding:12px 0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dash-header{padding:20px 24px 0;background:#f7f8fa}
+.dash-title{font-size:17px;font-weight:500;margin-bottom:4px}
+.dash-sub{font-size:13px;color:#888;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:14px 16px;cursor:pointer}
+.stat-card.active-card{border-color:#2563eb;background:#fafcff}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.stat-label{font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:0.04em}
+.stat-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.si-orange{background:#fff7ed;color:#ea580c}
+.si-red{background:#fef2f2;color:#ef4444}
+.si-green{background:#f0fdf4;color:#16a34a}
+.stat-num{font-size:22px;font-weight:500}
+.stat-num.orange{color:#ea580c}
+.stat-num.red{color:#ef4444}
+.stat-num.green{color:#16a34a}
+.filter-tabs{display:flex;gap:6px;padding:0 24px 0;margin-bottom:0}
+.ftab{padding:7px 18px;border-radius:8px 8px 0 0;font-size:13px;font-weight:500;cursor:pointer;color:#888;background:#efefef;border:1px solid #e4e4e4;border-bottom:none}
+.ftab.active{background:#fff;color:#2563eb;border-color:#e0e8ff}
+.ticket-area{flex:1;background:#fff;border-top:1px solid #e4e4e4;overflow:auto}
+.ticket-list-header{display:grid;grid-template-columns:2fr 1.4fr 2.5fr 1fr 1fr;gap:0;padding:9px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa}
+.th{font-size:11px;font-weight:500;color:#bbb;text-transform:uppercase;letter-spacing:0.04em}
+.ticket-row{display:grid;grid-template-columns:2fr 1.4fr 2.5fr 1fr 1fr;gap:0;padding:12px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer;align-items:center}
+.ticket-row:hover{background:#f8faff}
+.ticket-row.unread .t-name{font-weight:500}
+.t-name{font-size:13px;color:#1a1a1a;display:flex;align-items:center;gap:7px}
+.unread-dot{width:7px;height:7px;border-radius:50%;background:#2563eb;flex-shrink:0}
+.t-laptop{font-size:12px;color:#555;font-family:var(--font-mono,'monospace')}
+.t-issue{font-size:12px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.t-time{font-size:11px;color:#bbb}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-orange{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+.pill-red{background:#fef2f2;color:#ef4444;border:1px solid #fecaca}
+.pill-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+.pill-yellow{background:#fefce8;color:#ca8a04;border:1px solid #fde68a}
+.pill-gray{background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb}
+.sla-warn{font-size:11px;color:#ef4444;display:flex;align-items:center;gap:3px}
+.empty-state{text-align:center;padding:48px 24px;color:#ccc}
+.empty-state i{font-size:32px;display:block;margin-bottom:8px}
+.empty-state p{font-size:13px}
+</style>
+
+<h2 class="sr-only">Admin dashboard wireframe — IT Ticketing System</h2>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <i class="ti ti-ticket" aria-hidden="true"></i>
+        DSCA IT Support
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="notif">
+        <i class="ti ti-bell" aria-hidden="true"></i>
+        <div class="notif-dot"></div>
+      </div>
+      <span class="admin-name">John Doe</span>
+      <div class="avatar">JD</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar" id="sidebar">
+      <div class="sb-toggle">
+        <button onclick="toggleSidebar()" aria-label="Toggle sidebar">
+          <i class="ti ti-menu-2" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-label">Main</div>
+        <div class="sb-item active">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="sb-sub" id="dash-sub">
+          <div class="sb-sub-item active">Pending <span class="sb-count orange">12</span></div>
+          <div class="sb-sub-item">Unresolved <span class="sb-count red">5</span></div>
+          <div class="sb-sub-item">Resolved <span class="sb-count green">43</span></div>
+        </div>
+
+        <div class="sb-item" onclick="sendPrompt('Show me the admin inbox wireframe')">
+          <i class="ti ti-inbox" aria-hidden="true"></i>
+          <span>Inbox</span>
+        </div>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-label">Account</div>
+        <div class="sb-item" onclick="sendPrompt('Show me the account settings wireframe')">
+          <i class="ti ti-settings" aria-hidden="true"></i>
+          <span>Settings</span>
+        </div>
+        <div class="sb-item" style="color:#ef4444">
+          <i class="ti ti-logout" aria-hidden="true"></i>
+          <span>Sign out</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="dash-header">
+        <div class="dash-title">Dashboard</div>
+        <div class="dash-sub">Monday, 7 Aug 2026 · Welcome back, John</div>
+
+        <div class="stat-row">
+          <div class="stat-card active-card" onclick="setFilter('pending',this)">
+            <div class="stat-top">
+              <span class="stat-label">Pending</span>
+              <div class="stat-icon si-orange"><i class="ti ti-clock" aria-hidden="true"></i></div>
+            </div>
+            <div class="stat-num orange">12</div>
+          </div>
+          <div class="stat-card" onclick="setFilter('unresolved',this)">
+            <div class="stat-top">
+              <span class="stat-label">Unresolved</span>
+              <div class="stat-icon si-red"><i class="ti ti-alert-circle" aria-hidden="true"></i></div>
+            </div>
+            <div class="stat-num red">5</div>
+          </div>
+          <div class="stat-card" onclick="setFilter('resolved',this)">
+            <div class="stat-top">
+              <span class="stat-label">Resolved</span>
+              <div class="stat-icon si-green"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+            </div>
+            <div class="stat-num green">43</div>
+          </div>
+        </div>
+
+        <div class="filter-tabs">
+          <div class="ftab active" id="ftab-pending" onclick="setFilter('pending')">Pending</div>
+          <div class="ftab" id="ftab-unresolved" onclick="setFilter('unresolved')">Unresolved</div>
+          <div class="ftab" id="ftab-resolved" onclick="setFilter('resolved')">Resolved</div>
+        </div>
+      </div>
+
+      <div class="ticket-area">
+        <div class="ticket-list-header">
+          <div class="th">Submitter</div>
+          <div class="th">Laptop no.</div>
+          <div class="th">Issue</div>
+          <div class="th">Priority</div>
+          <div class="th">Time</div>
+        </div>
+        <div id="ticket-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const tickets = {
+  pending: [
+    {name:'Maria Santos',laptop:'DSCA-LAPTOP-007',issue:'Internet issue — connection drops every 30 mins',priority:'high',time:'10m ago',unread:true,sla:false},
+    {name:'Ahmed Al Farsi',laptop:'DSCA-LAPTOP-003',issue:'Software issue — MS Teams won\'t launch after update',priority:'medium',time:'42m ago',unread:true,sla:false},
+    {name:'Priya Nair',laptop:'DSCA-LAPTOP-011',issue:'Hardware issue — keyboard keys are sticking',priority:'low',time:'1h ago',unread:false,sla:false},
+    {name:'Carlos Reyes',laptop:'DSCA-LAPTOP-002',issue:'Account issue — locked out of company email',priority:'critical',time:'2h ago',unread:false,sla:true},
+    {name:'Sara Abdullah',laptop:'DSCA-LAPTOP-009',issue:'Other — screen flickers when on battery mode',priority:'medium',time:'3h ago',unread:false,sla:false},
+    {name:'James Wong',laptop:'DSCA-LAPTOP-005',issue:'Internet issue — VPN not connecting from JBR site',priority:'high',time:'5h ago',unread:false,sla:true},
+  ],
+  unresolved: [
+    {name:'Fatima Al Mansoori',laptop:'DSCA-LAPTOP-001',issue:'Hardware issue — laptop won\'t charge past 40%',priority:'high',time:'1d ago',unread:false,sla:true},
+    {name:'Lena Müller',laptop:'DSCA-LAPTOP-008',issue:'Software issue — Adobe license expired, can\'t activate',priority:'medium',time:'2d ago',unread:false,sla:true},
+    {name:'Omar Khalil',laptop:'DSCA-LAPTOP-004',issue:'Account issue — cannot access shared drive folder',priority:'low',time:'2d ago',unread:false,sla:false},
+  ],
+  resolved: [
+    {name:'Aisha Rahman',laptop:'DSCA-LAPTOP-006',issue:'Internet issue — slow speeds at Dubai Mall site',priority:'medium',time:'Yesterday',unread:false,sla:false},
+    {name:'Ben Carter',laptop:'DSCA-LAPTOP-010',issue:'Software issue — printer driver not installing',priority:'low',time:'Yesterday',unread:false,sla:false},
+    {name:'Noor Al Hashimi',laptop:'DSCA-LAPTOP-012',issue:'Account issue — password reset request',priority:'low',time:'2d ago',unread:false,sla:false},
+  ]
+};
+
+const pillMap = {
+  critical:{cls:'pill-red',label:'Critical'},
+  high:{cls:'pill-orange',label:'High'},
+  medium:{cls:'pill-yellow',label:'Medium'},
+  low:{cls:'pill-gray',label:'Low'}
+};
+
+let current = 'pending';
+
+function setFilter(f, card) {
+  current = f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ftab-'+f).classList.add('active');
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active-card'));
+  if(card) card.classList.add('active-card');
+  renderTickets();
+}
+
+function renderTickets() {
+  const list = document.getElementById('ticket-list');
+  const data = tickets[current];
+  if(!data||!data.length){
+    list.innerHTML='<div class="empty-state"><i class="ti ti-inbox" aria-hidden="true"></i><p>No '+current+' tickets</p></div>';
+    return;
+  }
+  list.innerHTML = data.map(t=>{
+    const p = pillMap[t.priority];
+    return `<div class="ticket-row ${t.unread?'unread':''}" onclick="sendPrompt('Show me the ticket detail view wireframe')">
+      <div class="t-name">${t.unread?'<div class="unread-dot"></div>':''} ${t.name}</div>
+      <div class="t-laptop">${t.laptop}</div>
+      <div class="t-issue">${t.issue}${t.sla?'<br><span class="sla-warn"><i class="ti ti-alarm" aria-hidden="true"></i> SLA breach</span>':''}</div>
+      <div><span class="pill ${p.cls}">${p.label}</span></div>
+      <div class="t-time">${t.time}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+}
+
+renderTickets();
+</script>

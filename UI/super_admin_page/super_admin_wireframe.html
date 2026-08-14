@@ -1,0 +1,389 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{background:#f7f8fa;font-family:var(--font-sans);color:#1a1a1a;display:flex;flex-direction:column;min-height:700px}
+.topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0}
+.logo{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.logo i{font-size:18px;color:#7c3aed}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#f5f3ff;border:1px solid #ddd6fe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#7c3aed}
+.admin-name{font-size:13px;color:#555}
+.body{display:flex;flex:1}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;flex-shrink:0;transition:width 0.2s}
+.sidebar.collapsed{width:52px}
+.sb-toggle{display:flex;align-items:center;justify-content:flex-end;padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.sb-toggle button{background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;padding:2px}
+.sb-section{padding:8px 0}
+.sb-label{font-size:10px;font-weight:500;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;padding:6px 16px 4px;white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .sb-label{opacity:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:#666;font-size:13px;white-space:nowrap;overflow:hidden;border-left:3px solid transparent}
+.sb-item:hover{background:#f7f8fa;color:#1a1a1a}
+.sb-item.active{background:#f5f3ff;color:#7c3aed;border-left-color:#7c3aed}
+.sb-item i{font-size:17px;flex-shrink:0}
+.sb-item span{overflow:hidden;transition:opacity 0.15s}
+.sidebar.collapsed .sb-item span{opacity:0;width:0}
+.sb-sub{padding-left:43px;font-size:12px;color:#888;display:flex;flex-direction:column;gap:1px}
+.sidebar.collapsed .sb-sub{display:none}
+.sb-sub-item{padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.sb-sub-item:hover{background:#f5f3ff;color:#7c3aed}
+.sb-sub-item.active{color:#7c3aed;font-weight:500}
+.sb-count{font-size:10px;background:#f3f4f6;color:#888;padding:1px 6px;border-radius:10px}
+.sb-count.orange{background:#fff7ed;color:#ea580c}
+.sb-count.red{background:#fef2f2;color:#ef4444}
+.sb-count.green{background:#f0fdf4;color:#16a34a}
+.main{flex:1;overflow:auto;padding:24px;min-width:0}
+.tabs{display:flex;gap:6px;margin-bottom:20px}
+.tab{padding:8px 18px;border-radius:8px;border:1px solid #e4e4e4;background:#fff;font-size:13px;font-weight:500;color:#888;cursor:pointer}
+.tab.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.section{display:none}
+.section.active{display:block}
+/* Analytics */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:#aaa;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.stat-label i{font-size:14px}
+.stat-num{font-size:24px;font-weight:500;color:#1a1a1a}
+.stat-sub{font-size:11px;color:#aaa;margin-top:2px}
+.stat-sub.up{color:#16a34a}
+.stat-sub.down{color:#ef4444}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:18px}
+.chart-title{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.chart-title span{font-size:11px;color:#aaa;font-weight:400}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:#555;width:80px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;background:#f3f4f6;border-radius:20px;height:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px}
+.bar-val{font-size:12px;color:#888;width:28px;text-align:right;flex-shrink:0}
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#555}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-val{margin-left:auto;font-weight:500;color:#1a1a1a;padding-left:12px}
+.perf-table{width:100%;border-collapse:collapse}
+.perf-table th{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:0.04em;font-weight:500;text-align:left;padding:8px 12px;border-bottom:1px solid #f0f0f0}
+.perf-table td{font-size:13px;padding:10px 12px;border-bottom:1px solid #f5f5f5;color:#1a1a1a}
+.perf-table tr:last-child td{border-bottom:none}
+.perf-table tr:hover td{background:#f8f8f8}
+.mini-bar-track{width:80px;background:#f3f4f6;border-radius:20px;height:6px;display:inline-block;vertical-align:middle}
+.mini-bar-fill{height:100%;border-radius:20px;background:#7c3aed}
+.date-filter{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.date-filter select{padding:7px 10px;border-radius:8px;border:1px solid #e0e0e0;background:#fff;font-size:13px;color:#555;font-family:var(--font-sans)}
+.date-filter label{font-size:13px;color:#888}
+/* Admin management */
+.mgmt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mgmt-title{font-size:15px;font-weight:500}
+.mgmt-sub{font-size:13px;color:#888;margin-top:2px}
+.add-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;background:#7c3aed;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+.add-btn i{font-size:15px}
+.admin-table-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;overflow:hidden}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:0.04em;font-weight:500;text-align:left;padding:10px 18px;border-bottom:1px solid #f0f0f0;background:#fafafa}
+.admin-table td{font-size:13px;padding:12px 18px;border-bottom:1px solid #f5f5f5;color:#1a1a1a;vertical-align:middle}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:#fafbff}
+.admin-avatar{width:30px;height:30px;border-radius:50%;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#2563eb;flex-shrink:0}
+.admin-avatar.purple{background:#f5f3ff;border-color:#ddd6fe;color:#7c3aed}
+.name-cell{display:flex;align-items:center;gap:10px}
+.admin-email{font-size:11px;color:#aaa;margin-top:1px}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.p-purple{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe}
+.p-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+.p-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.p-gray{background:#f9fafb;color:#9ca3af;border:1px solid #e5e7eb}
+.p-red{background:#fef2f2;color:#ef4444;border:1px solid #fecaca}
+.action-btns{display:flex;gap:6px}
+.act-btn{padding:5px 10px;border-radius:6px;font-size:12px;border:1px solid #e4e4e4;background:#fff;color:#555;cursor:pointer;font-family:var(--font-sans)}
+.act-btn:hover{border-color:#7c3aed;color:#7c3aed;background:#f5f3ff}
+.act-btn.danger:hover{border-color:#fecaca;color:#ef4444;background:#fef2f2}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);display:none;align-items:center;justify-content:center;z-index:200}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:28px;width:400px;border:1px solid #e4e4e4}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:4px}
+.modal-sub{font-size:13px;color:#888;margin-bottom:20px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:11px;font-weight:500;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em}
+.modal-field input,.modal-field select{width:100%;padding:9px 11px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:var(--font-sans);color:#1a1a1a}
+.modal-field input:focus,.modal-field select:focus{outline:none;border-color:#7c3aed}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.modal-cancel{padding:9px 16px;border-radius:8px;background:#fff;border:1px solid #e0e0e0;font-size:13px;color:#555;cursor:pointer;font-family:var(--font-sans)}
+.modal-save{padding:9px 18px;border-radius:8px;background:#7c3aed;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo"><i class="ti ti-shield-lock" aria-hidden="true"></i>DSCA IT Support — Super Admin</div>
+    <div class="topbar-right">
+      <span class="admin-name">Heisenberg</span>
+      <div class="avatar">SA</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar" id="sidebar">
+      <div class="sb-toggle"><button onclick="toggleSidebar()" aria-label="Toggle sidebar"><i class="ti ti-menu-2" aria-hidden="true"></i></button></div>
+      <div class="sb-section">
+        <div class="sb-label">Main</div>
+        <div class="sb-item" onclick="sendPrompt('Show me the admin dashboard wireframe')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i><span>Dashboard</span></div>
+        <div class="sb-sub">
+          <div class="sb-sub-item">Pending <span class="sb-count orange">12</span></div>
+          <div class="sb-sub-item">Unresolved <span class="sb-count red">5</span></div>
+          <div class="sb-sub-item">Resolved <span class="sb-count green">43</span></div>
+        </div>
+        <div class="sb-item" onclick="sendPrompt('Show me the admin inbox wireframe')"><i class="ti ti-inbox" aria-hidden="true"></i><span>Inbox</span></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Super Admin</div>
+        <div class="sb-item active" onclick="switchTab('analytics')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span>Analytics</span></div>
+        <div class="sb-item" onclick="switchTab('admins');this.classList.add('active');document.querySelector('.sb-item.active:not(this)').classList.remove('active')"><i class="ti ti-users" aria-hidden="true"></i><span>Admin management</span></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Account</div>
+        <div class="sb-item"><i class="ti ti-settings" aria-hidden="true"></i><span>Settings</span></div>
+        <div class="sb-item" style="color:#ef4444"><i class="ti ti-logout" aria-hidden="true"></i><span>Sign out</span></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="tabs">
+        <div class="tab active" id="tab-analytics" onclick="switchTab('analytics')">
+          <i class="ti ti-chart-bar" style="font-size:14px;vertical-align:middle;margin-right:4px" aria-hidden="true"></i>Analytics
+        </div>
+        <div class="tab" id="tab-admins" onclick="switchTab('admins')">
+          <i class="ti ti-users" style="font-size:14px;vertical-align:middle;margin-right:4px" aria-hidden="true"></i>Admin management
+        </div>
+      </div>
+
+      <!-- ANALYTICS SECTION -->
+      <div class="section active" id="section-analytics">
+        <div class="date-filter">
+          <label>Date range:</label>
+          <select>
+            <option>Last 30 days</option>
+            <option>Last 7 days</option>
+            <option>Last 90 days</option>
+            <option>All time</option>
+          </select>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-ticket" aria-hidden="true"></i>Total tickets</div>
+            <div class="stat-num">312</div>
+            <div class="stat-sub up">↑ 18% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-circle-check" aria-hidden="true"></i>Resolved</div>
+            <div class="stat-num">239</div>
+            <div class="stat-sub up">76.6% resolution rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-clock" aria-hidden="true"></i>Avg. resolution</div>
+            <div class="stat-num">4.7h</div>
+            <div class="stat-sub down">↑ 0.8h slower vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-alarm" aria-hidden="true"></i>SLA breaches</div>
+            <div class="stat-num">12</div>
+            <div class="stat-sub down">↑ 3 more vs last month</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-title">Tickets by site <span>Last 30 days</span></div>
+            <div class="bar-chart">
+              <div class="bar-row"><div class="bar-label">HQ / Moe</div><div class="bar-track"><div class="bar-fill" style="width:75%;background:#7c3aed"></div></div><div class="bar-val">120</div></div>
+              <div class="bar-row"><div class="bar-label">Branch A</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#a78bfa"></div></div><div class="bar-val">80</div></div>
+              <div class="bar-row"><div class="bar-label">ADCB</div><div class="bar-track"><div class="bar-fill" style="width:40%;background:#c4b5fd"></div></div><div class="bar-val">65</div></div>
+              <div class="bar-row"><div class="bar-label">Dubai Mall</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:#ddd6fe"></div></div><div class="bar-val">47</div></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Tickets by issue type <span>Last 30 days</span></div>
+            <div class="donut-wrap">
+              <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90" aria-label="Donut chart of tickets by issue type">
+                <circle cx="45" cy="45" r="32" fill="none" stroke="#f3f4f6" stroke-width="14"/>
+                <circle cx="45" cy="45" r="32" fill="none" stroke="#7c3aed" stroke-width="14" stroke-dasharray="80 121" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
+                <circle cx="45" cy="45" r="32" fill="none" stroke="#a78bfa" stroke-width="14" stroke-dasharray="54 147" stroke-dashoffset="-80" transform="rotate(-90 45 45)"/>
+                <circle cx="45" cy="45" r="32" fill="none" stroke="#2563eb" stroke-width="14" stroke-dasharray="36 165" stroke-dashoffset="-134" transform="rotate(-90 45 45)"/>
+                <circle cx="45" cy="45" r="32" fill="none" stroke="#e5e7eb" stroke-width="14" stroke-dasharray="31 170" stroke-dashoffset="-170" transform="rotate(-90 45 45)"/>
+                <text x="45" y="48" text-anchor="middle" font-size="11" font-weight="500" fill="#1a1a1a">312</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div>Software <span class="legend-val">98</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>Hardware <span class="legend-val">80</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Internet <span class="legend-val">55</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#e5e7eb"></div>Other <span class="legend-val">79</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Tickets by status <span>Current</span></div>
+            <div class="bar-chart">
+              <div class="bar-row"><div class="bar-label">Resolved</div><div class="bar-track"><div class="bar-fill" style="width:77%;background:#16a34a"></div></div><div class="bar-val">239</div></div>
+              <div class="bar-row"><div class="bar-label">Pending</div><div class="bar-track"><div class="bar-fill" style="width:15%;background:#ea580c"></div></div><div class="bar-val">45</div></div>
+              <div class="bar-row"><div class="bar-label">Unresolved</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:#ef4444"></div></div><div class="bar-val">28</div></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Tickets by priority <span>Last 30 days</span></div>
+            <div class="bar-chart">
+              <div class="bar-row"><div class="bar-label">Medium</div><div class="bar-track"><div class="bar-fill" style="width:65%;background:#ca8a04"></div></div><div class="bar-val">150</div></div>
+              <div class="bar-row"><div class="bar-label">High</div><div class="bar-track"><div class="bar-fill" style="width:36%;background:#ea580c"></div></div><div class="bar-val">82</div></div>
+              <div class="bar-row"><div class="bar-label">Low</div><div class="bar-track"><div class="bar-fill" style="width:26%;background:#6b7280"></div></div><div class="bar-val">60</div></div>
+              <div class="bar-row"><div class="bar-label">Critical</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:#ef4444"></div></div><div class="bar-val">20</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Admin performance <span>Last 30 days</span></div>
+          <table class="perf-table">
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Assigned</th>
+                <th>Resolved</th>
+                <th>Avg. time</th>
+                <th>Resolution rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="admin-avatar">JD</div>John Doe</div></td><td>60</td><td>43</td><td>3.2h</td><td><div style="display:flex;align-items:center;gap:8px"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:72%"></div></div>72%</div></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="admin-avatar">JS</div>Jane Smith</div></td><td>55</td><td>44</td><td>4.1h</td><td><div style="display:flex;align-items:center;gap:8px"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:80%"></div></div>80%</div></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="admin-avatar">AH</div>Ali Hassan</div></td><td>48</td><td>40</td><td>5.8h</td><td><div style="display:flex;align-items:center;gap:8px"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:83%"></div></div>83%</div></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="admin-avatar">LM</div>Lena Müller</div></td><td>32</td><td>22</td><td>6.4h</td><td><div style="display:flex;align-items:center;gap:8px"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:69%"></div></div>69%</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN MANAGEMENT SECTION -->
+      <div class="section" id="section-admins">
+        <div class="mgmt-header">
+          <div>
+            <div class="mgmt-title">Admin accounts</div>
+            <div class="mgmt-sub">4 accounts · 3 active · 1 deactivated</div>
+          </div>
+          <button class="add-btn" onclick="document.getElementById('modal').classList.add('open')">
+            <i class="ti ti-plus" aria-hidden="true"></i>Add admin
+          </button>
+        </div>
+
+        <div class="admin-table-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Resolved</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-tbody">
+              <tr>
+                <td><div class="name-cell"><div class="admin-avatar purple">SA</div><div><div>Heisenberg</div><div class="admin-email">super@dscacontacting.com</div></div></div></td>
+                <td><span class="pill p-purple">Super Admin</span></td>
+                <td><span class="pill p-green">Active</span></td>
+                <td>Jan 1, 2026</td>
+                <td>—</td>
+                <td><span style="font-size:12px;color:#bbb">You</span></td>
+              </tr>
+              <tr>
+                <td><div class="name-cell"><div class="admin-avatar">JD</div><div><div>John Doe</div><div class="admin-email">john@dscacontacting.com</div></div></div></td>
+                <td><span class="pill p-blue">Admin</span></td>
+                <td><span class="pill p-green">Active</span></td>
+                <td>Jan 12, 2026</td>
+                <td>43</td>
+                <td><div class="action-btns"><button class="act-btn" onclick="editAdmin(this)">Edit</button><button class="act-btn danger" onclick="deactivateAdmin(this)">Deactivate</button></div></td>
+              </tr>
+              <tr>
+                <td><div class="name-cell"><div class="admin-avatar">JS</div><div><div>Jane Smith</div><div class="admin-email">jane@dscacontacting.com</div></div></div></td>
+                <td><span class="pill p-blue">Admin</span></td>
+                <td><span class="pill p-green">Active</span></td>
+                <td>Feb 3, 2026</td>
+                <td>44</td>
+                <td><div class="action-btns"><button class="act-btn" onclick="editAdmin(this)">Edit</button><button class="act-btn danger" onclick="deactivateAdmin(this)">Deactivate</button></div></td>
+              </tr>
+              <tr>
+                <td><div class="name-cell"><div class="admin-avatar">LM</div><div><div>Lena Müller</div><div class="admin-email">lena@dscacontacting.com</div></div></div></td>
+                <td><span class="pill p-blue">Admin</span></td>
+                <td><span class="pill p-gray">Inactive</span></td>
+                <td>Mar 20, 2026</td>
+                <td>22</td>
+                <td><div class="action-btns"><button class="act-btn" onclick="editAdmin(this)">Edit</button><button class="act-btn" onclick="reactivateAdmin(this)" style="color:#16a34a;border-color:#bbf7d0">Reactivate</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add admin modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Add new admin</div>
+    <div class="modal-sub">The new admin will receive a welcome email with their temporary password.</div>
+    <div class="modal-field"><label>Full name</label><input type="text" placeholder="e.g. Ali Hassan" /></div>
+    <div class="modal-field"><label>Email</label><input type="email" placeholder="name@dscacontacting.com" /></div>
+    <div class="modal-field"><label>Temporary password</label><input type="password" placeholder="Min 8 chars, 1 number, 1 symbol" /></div>
+    <div class="modal-field"><label>Role</label>
+      <select><option>Admin (IT)</option><option>Super Admin</option></select>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="document.getElementById('modal').classList.remove('open')">Cancel</button>
+      <button class="modal-save" onclick="document.getElementById('modal').classList.remove('open')">Create account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('section-'+t).classList.add('active');
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modal')) document.getElementById('modal').classList.remove('open');
+}
+
+function deactivateAdmin(btn){
+  const row=btn.closest('tr');
+  row.querySelector('.pill').className='pill p-gray';
+  row.querySelector('.pill').textContent='Inactive';
+  btn.textContent='Reactivate';
+  btn.classList.remove('danger');
+  btn.style.color='#16a34a';
+  btn.style.borderColor='#bbf7d0';
+  btn.onclick=function(){reactivateAdmin(this)};
+}
+
+function reactivateAdmin(btn){
+  const row=btn.closest('tr');
+  row.querySelector('.pill').className='pill p-green';
+  row.querySelector('.pill').textContent='Active';
+  btn.textContent='Deactivate';
+  btn.style.color='';
+  btn.style.borderColor='';
+  btn.classList.add('danger');
+  btn.onclick=function(){deactivateAdmin(this)};
+}
+
+function editAdmin(btn){
+  document.getElementById('modal').classList.add('open');
+}
+</script>

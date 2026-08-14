@@ -1,0 +1,118 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{background:#f7f8fa;font-family:var(--font-sans);color:#1a1a1a;min-height:600px;display:flex;flex-direction:column}
+.topbar{padding:16px 32px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;color:#1a1a1a}
+.logo i{font-size:20px;color:#2563eb}
+.back-btn{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;cursor:pointer;border:none;background:none;font-family:var(--font-sans)}
+.back-btn i{font-size:14px}
+.center{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.login-card{background:#fff;border:1px solid #e4e4e4;border-radius:16px;padding:36px 32px;width:100%;max-width:380px}
+.card-icon{width:44px;height:44px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.card-icon i{font-size:22px;color:#2563eb}
+.card-title{font-size:18px;font-weight:500;margin-bottom:4px;color:#1a1a1a}
+.card-sub{font-size:13px;color:#888;margin-bottom:28px;line-height:1.5}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:500;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.field input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:13px;font-family:var(--font-sans)}
+.field input:focus{outline:none;border-color:#2563eb}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:38px}
+.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#bbb;cursor:pointer;font-size:16px;background:none;border:none;padding:0}
+.forgot{text-align:right;margin-top:-10px;margin-bottom:20px}
+.forgot a{font-size:12px;color:#2563eb;cursor:pointer;text-decoration:none}
+.login-btn{width:100%;padding:11px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-sans);margin-bottom:16px}
+.divider{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.divider hr{flex:1;border:none;border-top:1px solid #efefef}
+.divider span{font-size:11px;color:#ccc}
+.security-note{background:#f8faff;border:1px solid #e8eef8;border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.security-note i{font-size:16px;color:#2563eb;margin-top:1px;flex-shrink:0}
+.security-note p{font-size:12px;color:#666;line-height:1.5}
+.rate-note{background:#fff8f0;border:1px solid #fde8c8;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.rate-note i{font-size:15px;color:#d97706;flex-shrink:0}
+.rate-note p{font-size:12px;color:#92400e;line-height:1.5}
+.footer{text-align:center;padding:20px;font-size:12px;color:#ccc;background:#f7f8fa}
+.role-badge{display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:20px;font-size:11px;font-weight:500;padding:3px 10px;margin-bottom:20px}
+.role-badge i{font-size:12px}
+</style>
+
+<h2 class="sr-only">Admin login page wireframe — IT Ticketing System</h2>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo">
+      <i class="ti ti-ticket" aria-hidden="true"></i>
+      DSCA IT Support
+    </div>
+    <button class="back-btn" onclick="sendPrompt('Show me the landing page wireframe')">
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>
+      Back to landing page
+    </button>
+  </div>
+
+  <div class="center">
+    <div class="login-card">
+      <div class="card-icon">
+        <i class="ti ti-shield-lock" aria-hidden="true"></i>
+      </div>
+
+      <div class="card-title">Admin portal</div>
+      <div class="card-sub">Sign in to manage and resolve IT support tickets.</div>
+
+      <div class="role-badge">
+        <i class="ti ti-users" aria-hidden="true"></i>
+        IT staff and super admins only
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="name@dscacontracting.com" />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" placeholder="Enter your password" id="pw" />
+          <button class="pw-eye" onclick="togglePw()" aria-label="Toggle password visibility">
+            <i class="ti ti-eye" id="eye-icon" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="forgot"><a>Forgot password?</a></div>
+
+      <div class="rate-note">
+        <i class="ti ti-info-circle" aria-hidden="true"></i>
+        <p>10 failed attempts will lock this account for 15 minutes.</p>
+      </div>
+
+      <button class="login-btn" onclick="sendPrompt('Show me the admin dashboard wireframe')">Sign in ↗</button>
+
+      <div class="divider">
+        <hr /><span>secured by</span><hr />
+      </div>
+
+      <div class="security-note">
+        <i class="ti ti-lock" aria-hidden="true"></i>
+        <p>Sessions are protected with JWT stored in HttpOnly cookies. All connections are encrypted via HTTPS.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">DSCA IT Support · Admin access only · Unauthorized access is prohibited</div>
+</div>
+
+<script>
+function togglePw() {
+  const pw = document.getElementById('pw');
+  const icon = document.getElementById('eye-icon');
+  if (pw.type === 'password') {
+    pw.type = 'text';
+    icon.className = 'ti ti-eye-off';
+  } else {
+    pw.type = 'password';
+    icon.className = 'ti ti-eye';
+  }
+}
+</script>

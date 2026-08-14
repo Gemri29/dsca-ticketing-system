@@ -17,20 +17,32 @@ export const submitTicket = async (req, res) => {
     }
 
     const {
-      fullName, email, laptopNumber,
+      fullName, email, laptopNumber, desktopNumber, siteName,
       issueType, customIssue, priority
     } = req.body
 
-    // Verify laptop exists in DB
-    const laptop = await prisma.laptop.findUnique({
-      where: { assetCode: laptopNumber }
-    })
-    if (!laptop || !laptop.active) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed.',
-        errors: { laptopNumber: 'Laptop not found in registered assets.' }
-      })
+    // Verify laptop exists in DB if provided
+    if (laptopNumber) {
+      const laptop = await prisma.laptop.findUnique({ where: { assetCode: laptopNumber } })
+      if (!laptop || !laptop.active) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed.',
+          errors: { laptopNumber: 'Laptop not found in registered assets.' }
+        })
+      }
+    }
+
+    // Verify desktop exists in DB if provided
+    if (desktopNumber) {
+      const desktop = await prisma.desktop.findUnique({ where: { assetCode: desktopNumber } })
+      if (!desktop || !desktop.active) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed.',
+          errors: { desktopNumber: 'Desktop not found in registered assets.' }
+        })
+      }
     }
 
     // Handle file upload
@@ -48,7 +60,9 @@ export const submitTicket = async (req, res) => {
         ticketCode,
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
-        laptopNumber,
+        laptopNumber: laptopNumber || null,
+        desktopNumber: desktopNumber || null,
+        siteName: siteName.trim(),
         issueType,
         customIssue: customIssue?.trim() || null,
         priority,
@@ -64,8 +78,11 @@ export const submitTicket = async (req, res) => {
         fullName: ticket.fullName,
         ticketCode: ticket.ticketCode,
         issueType: ticket.issueType,
+        customIssue: ticket.customIssue,
         priority: ticket.priority,
-        laptopNumber: ticket.laptopNumber
+        laptopNumber: ticket.laptopNumber,
+        desktopNumber: ticket.desktopNumber,
+        siteName: ticket.siteName
       })
     } catch (emailErr) {
       // Don't fail the request if email fails — log and continue
@@ -335,6 +352,25 @@ export const getLaptops = async (req, res) => {
     return res.status(200).json({ success: true, laptops })
   } catch (err) {
     console.error('getLaptops error:', err)
+    return res.status(500).json({ success: false, message: 'Internal server error.' })
+  }
+}
+
+// ─────────────────────────────────────────────
+// PUBLIC — GET /api/desktops
+// ─────────────────────────────────────────────
+export const getDesktops = async (req, res) => {
+  try {
+    const desktops = await prisma.desktop.findMany({
+      where: { active: true },
+      select: { assetCode: true },
+      orderBy: { assetCode: 'asc' },
+      take: 100
+    })
+
+    return res.status(200).json({ success: true, desktops })
+  } catch (err) {
+    console.error('getDesktops error:', err)
     return res.status(500).json({ success: false, message: 'Internal server error.' })
   }
 }

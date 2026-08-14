@@ -1,0 +1,329 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{background:#f7f8fa;font-family:var(--font-sans);color:#1a1a1a;display:flex;flex-direction:column;min-height:700px}
+.topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0}
+.logo{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.logo i{font-size:18px;color:#2563eb}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#2563eb}
+.admin-name{font-size:13px;color:#555}
+.body{display:flex;flex:1}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;flex-shrink:0;transition:width 0.2s}
+.sidebar.collapsed{width:52px}
+.sb-toggle{display:flex;align-items:center;justify-content:flex-end;padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.sb-toggle button{background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;padding:2px}
+.sb-section{padding:8px 0}
+.sb-label{font-size:10px;font-weight:500;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;padding:6px 16px 4px;white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .sb-label{opacity:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:#666;font-size:13px;white-space:nowrap;overflow:hidden;border-left:3px solid transparent}
+.sb-item:hover{background:#f7f8fa;color:#1a1a1a}
+.sb-item.active{background:#eff6ff;color:#2563eb;border-left-color:#2563eb}
+.sb-item i{font-size:17px;flex-shrink:0}
+.sb-item span{overflow:hidden;transition:opacity 0.15s}
+.sidebar.collapsed .sb-item span{opacity:0;width:0}
+.sb-sub{padding-left:43px;font-size:12px;color:#888;display:flex;flex-direction:column;gap:1px}
+.sidebar.collapsed .sb-sub{display:none}
+.sb-sub-item{padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.sb-count{font-size:10px;background:#f3f4f6;color:#888;padding:1px 6px;border-radius:10px}
+.sb-count.orange{background:#fff7ed;color:#ea580c}
+.sb-count.red{background:#fef2f2;color:#ef4444}
+.sb-count.green{background:#f0fdf4;color:#16a34a}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:auto}
+.page-header{background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.back-btn{display:flex;align-items:center;gap:5px;font-size:13px;color:#888;cursor:pointer;background:none;border:none;font-family:var(--font-sans)}
+.back-btn:hover{color:#2563eb}
+.back-btn i{font-size:15px}
+.page-header-divider{color:#e0e0e0;font-size:16px}
+.ticket-code-head{font-size:14px;font-weight:500;color:#1a1a1a}
+.page-header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.content{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:20px 24px;align-items:start}
+.left{display:flex;flex-direction:column;gap:16px}
+.right{display:flex;flex-direction:column;gap:16px}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:20px}
+.card-title{font-size:13px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-title i{font-size:15px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{}
+.info-label{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;font-weight:500}
+.info-value{font-size:13px;color:#1a1a1a;font-weight:400}
+.info-value.mono{font-family:monospace;font-size:12px}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.p-orange{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+.p-red{background:#fef2f2;color:#ef4444;border:1px solid #fecaca}
+.p-yellow{background:#fefce8;color:#ca8a04;border:1px solid #fde68a}
+.p-gray{background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb}
+.p-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.p-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+.divider{border:none;border-top:1px solid #f0f0f0;margin:14px 0}
+.issue-text{font-size:13px;color:#1a1a1a;line-height:1.6;background:#f7f8fa;border-radius:8px;padding:12px 14px}
+.attach-box{border:1px solid #e8e8e8;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.attach-box:hover{background:#f8faff;border-color:#bfdbfe}
+.attach-icon{width:36px;height:36px;background:#eff6ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#2563eb;flex-shrink:0}
+.attach-name{font-size:13px;color:#1a1a1a;font-weight:500}
+.attach-size{font-size:11px;color:#aaa}
+.attach-dl{margin-left:auto;color:#2563eb;font-size:15px}
+.sla-alert{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:#ef4444}
+.sla-alert i{font-size:16px;flex-shrink:0}
+.status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.status-btn{padding:8px 6px;border-radius:8px;border:1px solid #e4e4e4;background:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-sans);color:#555;text-align:center;transition:all 0.15s}
+.status-btn:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+.status-btn.active-pending{border-color:#ea580c;color:#ea580c;background:#fff7ed}
+.status-btn.active-unresolved{border-color:#ef4444;color:#ef4444;background:#fef2f2}
+.status-btn.active-resolved{border-color:#16a34a;color:#16a34a;background:#f0fdf4}
+.assign-select{width:100%;padding:9px 11px;border-radius:8px;border:1px solid #e0e0e0;background:#fff;font-size:13px;font-family:var(--font-sans);color:#1a1a1a;margin-top:4px}
+.assign-select:focus{outline:none;border-color:#2563eb}
+.note-box{width:100%;border-radius:8px;border:1px solid #e0e0e0;background:#fff;font-size:13px;font-family:var(--font-sans);color:#1a1a1a;padding:9px 11px;resize:none;height:80px}
+.note-box:focus{outline:none;border-color:#2563eb}
+.note-box.remark-box{background:#fffdf5;border-color:#fde68a}
+.note-box.remark-box:focus{border-color:#ca8a04}
+.note-hint{font-size:11px;color:#bbb;margin-top:4px;display:flex;align-items:center;gap:4px}
+.note-hint i{font-size:12px}
+.save-btn{width:100%;padding:10px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans);margin-top:4px}
+.save-btn:hover{background:#1d4ed8}
+.resolve-btn{width:100%;padding:10px;border-radius:8px;background:#16a34a;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+.resolve-btn:hover{background:#15803d}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:10px;padding-bottom:14px;position:relative}
+.tl-item:not(:last-child)::before{content:'';position:absolute;left:11px;top:24px;bottom:0;width:1px;background:#f0f0f0}
+.tl-dot{width:22px;height:22px;border-radius:50%;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:11px;color:#2563eb;flex-shrink:0;margin-top:1px}
+.tl-dot.green{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a}
+.tl-dot.orange{background:#fff7ed;border-color:#fed7aa;color:#ea580c}
+.tl-content{}
+.tl-text{font-size:12px;color:#555;line-height:1.5}
+.tl-time{font-size:11px;color:#bbb;margin-top:2px}
+.section-label{font-size:11px;font-weight:500;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.saved-note{background:#f7f8fa;border-radius:8px;padding:10px 12px;font-size:12px;color:#555;line-height:1.6;border-left:3px solid #e0e0e0}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo"><i class="ti ti-ticket" aria-hidden="true"></i>DSCA IT Support</div>
+    <div class="topbar-right">
+      <span class="admin-name">John Doe</span>
+      <div class="avatar">JD</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar" id="sidebar">
+      <div class="sb-toggle"><button onclick="toggleSidebar()" aria-label="Toggle sidebar"><i class="ti ti-menu-2" aria-hidden="true"></i></button></div>
+      <div class="sb-section">
+        <div class="sb-label">Main</div>
+        <div class="sb-item" onclick="sendPrompt('Show me the admin dashboard wireframe')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i><span>Dashboard</span></div>
+        <div class="sb-sub">
+          <div class="sb-sub-item">Pending <span class="sb-count orange">12</span></div>
+          <div class="sb-sub-item">Unresolved <span class="sb-count red">5</span></div>
+          <div class="sb-sub-item">Resolved <span class="sb-count green">43</span></div>
+        </div>
+        <div class="sb-item" onclick="sendPrompt('Show me the admin inbox wireframe')"><i class="ti ti-inbox" aria-hidden="true"></i><span>Inbox</span></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Account</div>
+        <div class="sb-item" onclick="sendPrompt('Show me the account settings wireframe')"><i class="ti ti-settings" aria-hidden="true"></i><span>Settings</span></div>
+        <div class="sb-item" style="color:#ef4444"><i class="ti ti-logout" aria-hidden="true"></i><span>Sign out</span></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="page-header">
+        <button class="back-btn" onclick="sendPrompt('Show me the admin inbox wireframe')">
+          <i class="ti ti-arrow-left" aria-hidden="true"></i> Back to Inbox
+        </button>
+        <span class="page-header-divider">/</span>
+        <span class="ticket-code-head">TKT-4821</span>
+        <div class="page-header-right">
+          <span class="pill p-orange">Pending</span>
+          <span class="pill p-red">Critical</span>
+          <span class="pill" style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;display:flex;align-items:center;gap:4px"><i class="ti ti-alarm" style="font-size:13px" aria-hidden="true"></i>SLA Breach</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="left">
+
+          <div class="sla-alert">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            This ticket has exceeded the 48-hour SLA threshold. Submitted 51 hours ago — immediate attention required.
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="ti ti-user" aria-hidden="true"></i>Submitter details</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Full name</div>
+                <div class="info-value">Carlos Reyes</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">carlos@dscacontracting.com</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Laptop number</div>
+                <div class="info-value mono">DSCA-LAPTOP-002</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Site location</div>
+                <div class="info-value">ADCB</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Submitted</div>
+                <div class="info-value">Aug 7, 2026 · 9:14 AM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Last updated</div>
+                <div class="info-value">Aug 7, 2026 · 2:30 PM</div>
+              </div>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="card-title"><i class="ti ti-message-report" aria-hidden="true"></i>Issue details</div>
+            <div class="info-grid" style="margin-bottom:12px">
+              <div class="info-item">
+                <div class="info-label">Issue type</div>
+                <div class="info-value">Account issue</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Priority</div>
+                <div class="info-value"><span class="pill p-red">Critical</span></div>
+              </div>
+            </div>
+            <div class="info-label" style="margin-bottom:6px">Description</div>
+            <div class="issue-text">Locked out of company email since this morning. Cannot log in via browser or Outlook — getting "Invalid credentials" even after password reset attempt. Affecting all work communications. Urgent.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="ti ti-paperclip" aria-hidden="true"></i>Attachment</div>
+            <div class="attach-box">
+              <div class="attach-icon"><i class="ti ti-photo" aria-hidden="true"></i></div>
+              <div>
+                <div class="attach-name">screenshot-error.png</div>
+                <div class="attach-size">1.2 MB · PNG</div>
+              </div>
+              <div class="attach-dl"><i class="ti ti-download" aria-hidden="true"></i></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="ti ti-history" aria-hidden="true"></i>Activity timeline</div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot orange"><i class="ti ti-clock" aria-hidden="true"></i></div>
+                <div class="tl-content">
+                  <div class="tl-text">Ticket submitted by <strong>Carlos Reyes</strong></div>
+                  <div class="tl-time">Aug 7, 2026 · 9:14 AM</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"><i class="ti ti-user-check" aria-hidden="true"></i></div>
+                <div class="tl-content">
+                  <div class="tl-text">Assigned to <strong>John Doe</strong> by Super Admin</div>
+                  <div class="tl-time">Aug 7, 2026 · 9:30 AM</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"><i class="ti ti-note" aria-hidden="true"></i></div>
+                <div class="tl-content">
+                  <div class="tl-text"><strong>John Doe</strong> added an internal note</div>
+                  <div class="tl-time">Aug 7, 2026 · 2:30 PM</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot orange"><i class="ti ti-alarm" aria-hidden="true"></i></div>
+                <div class="tl-content">
+                  <div class="tl-text" style="color:#ef4444">SLA threshold exceeded — 48 hours passed</div>
+                  <div class="tl-time">Aug 9, 2026 · 9:14 AM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="right">
+
+          <div class="card">
+            <div class="card-title"><i class="ti ti-settings-2" aria-hidden="true"></i>Ticket actions</div>
+
+            <div class="section-label">Status</div>
+            <div class="status-btns" style="margin-bottom:14px">
+              <button class="status-btn active-pending" onclick="setStatus('pending',this)">Pending</button>
+              <button class="status-btn" onclick="setStatus('unresolved',this)">Unresolved</button>
+              <button class="status-btn" onclick="setStatus('resolved',this)">Resolved</button>
+            </div>
+
+            <div class="section-label">Assigned to</div>
+            <select class="assign-select" style="margin-bottom:14px">
+              <option>John Doe (you)</option>
+              <option>Jane Smith</option>
+              <option>Ali Hassan</option>
+              <option>Unassigned</option>
+            </select>
+
+            <hr class="divider" />
+
+            <div class="section-label" style="margin-bottom:6px">
+              <i class="ti ti-lock" style="font-size:12px" aria-hidden="true"></i>
+              Internal note <span style="font-weight:400;text-transform:none;letter-spacing:0">(admin only)</span>
+            </div>
+            <div class="saved-note" style="margin-bottom:8px">Checked AD — account shows locked after 5 failed attempts. Waiting on IT manager approval to reset MFA.</div>
+            <textarea class="note-box" id="note-input" placeholder="Add a new internal note..."></textarea>
+            <div class="note-hint"><i class="ti ti-eye-off" aria-hidden="true"></i>Only visible to admins — never shown to the submitter</div>
+            <button class="save-btn" style="background:#475569;margin-top:8px" onclick="saveNote()">Save note</button>
+
+            <hr class="divider" />
+
+            <div class="section-label" style="margin-bottom:6px">
+              <i class="ti ti-message-check" style="font-size:12px" aria-hidden="true"></i>
+              Remark for submitter <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span>
+            </div>
+            <textarea class="note-box remark-box" id="remark-input" placeholder="Leave a remark visible to the submitter when resolved..."></textarea>
+            <div class="note-hint"><i class="ti ti-eye" aria-hidden="true"></i>Shown to submitter when ticket is resolved</div>
+
+            <hr class="divider" />
+
+            <button class="resolve-btn" id="resolve-btn" onclick="resolveTicket()">
+              Mark as resolved
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
+
+function setStatus(s, btn){
+  document.querySelectorAll('.status-btn').forEach(b=>b.className='status-btn');
+  btn.classList.add('active-'+s);
+  const resolveBtn=document.getElementById('resolve-btn');
+  if(s==='resolved'){
+    resolveBtn.style.background='#aaa';
+    resolveBtn.textContent='Already resolved';
+  } else {
+    resolveBtn.style.background='#16a34a';
+    resolveBtn.textContent='Mark as resolved';
+  }
+}
+
+function saveNote(){
+  const input=document.getElementById('note-input');
+  if(!input.value.trim()) return;
+  const saved=document.querySelector('.saved-note');
+  saved.textContent=input.value;
+  input.value='';
+  input.placeholder='Note saved ✓ Add another...';
+  setTimeout(()=>input.placeholder='Add a new internal note...',2000);
+}
+
+function resolveTicket(){
+  document.querySelectorAll('.status-btn').forEach(b=>b.className='status-btn');
+  document.querySelector('.status-btn:last-child').classList.add('active-resolved');
+  document.getElementById('resolve-btn').style.background='#aaa';
+  document.getElementById('resolve-btn').textContent='Ticket resolved ✓';
+}
+</script>

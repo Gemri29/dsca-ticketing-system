@@ -2,8 +2,18 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export const sendConfirmationEmail = async ({ to, fullName, ticketCode, issueType, priority, laptopNumber }) => {
+export const sendConfirmationEmail = async ({ to, fullName, ticketCode, issueType, customIssue, priority, laptopNumber, desktopNumber, siteName }) => {
   const trackingUrl = `${process.env.FRONTEND_URL}/track?email=${encodeURIComponent(to)}&code=${ticketCode}`
+
+  const assetRow = laptopNumber
+    ? `<tr><td style="color:#888;padding:4px 0">Laptop</td><td style="font-weight:500">${laptopNumber}</td></tr>`
+    : desktopNumber
+    ? `<tr><td style="color:#888;padding:4px 0">Desktop</td><td style="font-weight:500">${desktopNumber}</td></tr>`
+    : ''
+
+  const issueDisplay = issueType === 'Other' && customIssue
+    ? `Other — ${customIssue}`
+    : issueType
 
   await resend.emails.send({
     from: process.env.EMAIL_FROM,
@@ -25,9 +35,10 @@ export const sendConfirmationEmail = async ({ to, fullName, ticketCode, issueTyp
             </div>
             <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0" />
             <table style="width:100%;font-size:13px">
-              <tr><td style="color:#888;padding:4px 0">Issue type</td><td style="font-weight:500">${issueType}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Issue</td><td style="font-weight:500">${issueDisplay}</td></tr>
               <tr><td style="color:#888;padding:4px 0">Priority</td><td style="font-weight:500">${priority}</td></tr>
-              <tr><td style="color:#888;padding:4px 0">Laptop</td><td style="font-weight:500">${laptopNumber}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Site</td><td style="font-weight:500">${siteName}</td></tr>
+              ${assetRow}
             </table>
           </div>
 

@@ -24,6 +24,11 @@ export const getLaptops = async () => {
   return res.data
 }
 
+export const getDesktops = async () => {
+  const res = await API.get('/tickets/desktops')
+  return res.data
+}
+
 export const getTickets = async (params) => {
   const res = await API.get('/tickets', { params })
   return res.data

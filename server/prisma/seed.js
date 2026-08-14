@@ -9,7 +9,7 @@ async function main() {
 
   // ── Super Admin ───────────────────────────────
   const existing = await prisma.user.findUnique({
-    where: { email: 'super_admin@dscacontacting.com' }
+    where: { email: 'super_admin@dscacontracting.com' }
   })
 
   if (!existing) {
@@ -17,7 +17,7 @@ async function main() {
     await prisma.user.create({
       data: {
         name: 'Super Admin',
-        email: 'super_admin@dscacontacting.com',
+        email: 'super_admin@dscacontracting.com',
         password: hashedPassword,
         role: 'SUPER_ADMIN',
         active: true
@@ -48,6 +48,22 @@ async function main() {
     })
   }
   console.log('✅ Laptop assets seeded')
+
+  // ── Desktop assets ────────────────────────────
+  const desktops = Array.from({ length: 100 }, (_, index) => ({
+    assetCode: `DSCA-IT-D-${String(index + 1).padStart(3, '0')}`,
+  }))
+
+  await prisma.desktop.deleteMany()
+
+  for (const desktop of desktops) {
+    await prisma.desktop.upsert({
+      where: { assetCode: desktop.assetCode },
+      update: { active: true },
+      create: { ...desktop, active: true }
+    })
+  }
+  console.log('✅ Desktop assets seeded')
 
   console.log('🎉 Seeding complete!')
 }

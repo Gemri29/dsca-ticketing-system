@@ -6,7 +6,8 @@ import {
   getTicketById,
   updateTicket,
   assignTicket,
-  getLaptops
+  getLaptops,
+  getDesktops
 } from '../controllers/ticketController.js'
 import isAuthenticated from '../middleware/isAuthenticated.js'
 import hasRole from '../middleware/hasRole.js'
@@ -26,6 +27,7 @@ router.post(
 )
 router.get('/track', trackLimiter, trackTicket)
 router.get('/laptops', getLaptops)
+router.get('/desktops', getDesktops)
 
 // ── Admin routes ──────────────────────────────
 router.get(

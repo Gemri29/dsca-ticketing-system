@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { submitTicket, getLaptops } from '../api/tickets'
+import { submitTicket, getLaptops, getDesktops } from '../api/tickets'
 
 
 const ISSUE_TYPES = ['Internet Issue', 'Account Issue', 'Hardware Issue', 'Software Issue', 'Other']
@@ -13,12 +13,17 @@ const LandingPage = () => {
   const [laptopQuery, setLaptopQuery] = useState('')
   const [laptopDropdownOpen, setLaptopDropdownOpen] = useState(false)
   const [selectedLaptop, setSelectedLaptop] = useState(null)
+  const [desktops, setDesktops] = useState([])
+  const [desktopQuery, setDesktopQuery] = useState('')
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false)
+  const [selectedDesktop, setSelectedDesktop] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(null)
 
   const [form, setForm] = useState({
     fullName: '',
     email: '',
+    siteName: '',
     issueType: '',
     customIssue: '',
     priority: 'MEDIUM',
@@ -37,6 +42,9 @@ const LandingPage = () => {
         console.error('Laptops fetch error:', err)
         setLaptops([])
       })
+    getDesktops()
+      .then(res => setDesktops(res.desktops || []))
+      .catch(() => setDesktops([]))
   }, [])
 
   const filteredLaptops = laptops.filter(l =>
@@ -47,6 +55,14 @@ const LandingPage = () => {
     const numB = parseInt(b.assetCode.split('-').pop(), 10);
 
     return numA - numB;
+  })
+
+  const filteredDesktops = desktops.filter(d =>
+    d.assetCode.toLowerCase().includes(desktopQuery.toLowerCase())
+  ).sort((a, b) => {
+    const numA = parseInt(a.assetCode.split('-').pop(), 10)
+    const numB = parseInt(b.assetCode.split('-').pop(), 10)
+    return numA - numB
   })
 
   const handleChange = (e) => {
@@ -61,15 +77,21 @@ const LandingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!selectedLaptop) {
-      toast.error('Please select a laptop number.')
+    if (!selectedLaptop && !selectedDesktop) {
+      toast.error('Please select a laptop or desktop number.')
+      return
+    }
+    if (!form.siteName.trim()) {
+      toast.error('Please enter a site name.')
       return
     }
 
     const data = new FormData()
     data.append('fullName', form.fullName)
     data.append('email', form.email)
-    data.append('laptopNumber', selectedLaptop)
+    if (selectedLaptop) data.append('laptopNumber', selectedLaptop)
+    if (selectedDesktop) data.append('desktopNumber', selectedDesktop)
+    data.append('siteName', form.siteName)
     data.append('issueType', form.issueType)
     data.append('customIssue', form.customIssue)
     data.append('priority', form.priority)
@@ -122,7 +144,7 @@ const LandingPage = () => {
                 Track ticket
               </button>
               <button
-                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null) }}
+                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', siteName: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null); setSelectedDesktop(null) }}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700"
               >
                 Submit another
@@ -176,6 +198,7 @@ const LandingPage = () => {
                 type="text" name="fullName" value={form.fullName}
                 onChange={handleChange} required
                 placeholder="e.g. Juan dela Cruz"
+                maxLength={50}
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -186,14 +209,15 @@ const LandingPage = () => {
               <input
                 type="email" name="email" value={form.email}
                 onChange={handleChange} required
-                placeholder="name@dscacontacting.com"
+                placeholder="name@dscacontracting.com"
+                maxLength={100}
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               />
             </div>
 
             {/* Laptop number combobox */}
-            <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Laptop number</label>
+            <div className={selectedDesktop ? 'opacity-40 pointer-events-none' : ''}>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Laptop number <span className="text-gray-300 normal-case">(if available)</span></label>
               {selectedLaptop ? (
                 <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                   <span className="text-sm text-blue-700 font-medium flex-1">{selectedLaptop}</span>
@@ -231,6 +255,58 @@ const LandingPage = () => {
               )}
             </div>
 
+            {/* Desktop number combobox */}
+            <div className={selectedLaptop ? 'opacity-40 pointer-events-none' : ''}>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Desktop number <span className="text-gray-300 normal-case">(if available)</span></label>
+              {selectedDesktop ? (
+                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                  <span className="text-sm text-blue-700 font-medium flex-1">{selectedDesktop}</span>
+                  <button type="button" onClick={() => { setSelectedDesktop(null); setDesktopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={desktopQuery}
+                    onChange={e => { setDesktopQuery(e.target.value); setDesktopDropdownOpen(true) }}
+                    onFocus={() => setDesktopDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setDesktopDropdownOpen(false), 150)}
+                    placeholder="Type to search e.g. 005"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                  {desktopDropdownOpen && (
+                    <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto">
+                      {filteredDesktops.length === 0 ? (
+                        <div className="px-3 py-2 text-sm text-gray-400 text-center">No matching desktop found</div>
+                      ) : (
+                        filteredDesktops.map(d => (
+                          <div
+                            key={d.assetCode}
+                            onMouseDown={() => { setSelectedDesktop(d.assetCode); setDesktopQuery(''); setDesktopDropdownOpen(false) }}
+                            className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
+                          >
+                            {d.assetCode}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Site name */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Site name</label>
+              <input
+                type="text" name="siteName" value={form.siteName}
+                onChange={handleChange} required
+                placeholder="e.g. Main Office"
+                maxLength={100}
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
             {/* Issue type */}
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Issue type</label>
@@ -251,8 +327,9 @@ const LandingPage = () => {
                 <textarea
                   name="customIssue" value={form.customIssue}
                   onChange={handleChange} required
-                  placeholder="Describe your issue in detail..."
+                  placeholder="Describe your issue in detail"
                   rows={3}
+                  maxLength={1000}
                   className="w-full px-3 py-2 rounded-lg border border-amber-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-amber-400 resize-none"
                 />
               </div>
