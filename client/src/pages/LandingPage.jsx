@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { submitTicket, getLaptops } from '../api/tickets'
 
-const SITE_LOCATIONS = ['Moe', 'Dubai Mall', 'ADCB', 'JBR']
+
 const ISSUE_TYPES = ['Internet Issue', 'Account Issue', 'Hardware Issue', 'Software Issue', 'Other']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
@@ -19,7 +19,6 @@ const LandingPage = () => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
-    siteLocation: '',
     issueType: '',
     customIssue: '',
     priority: 'MEDIUM',
@@ -43,6 +42,12 @@ const LandingPage = () => {
   const filteredLaptops = laptops.filter(l =>
     l.assetCode.toLowerCase().includes(laptopQuery.toLowerCase())
   )
+  .sort((a, b) => {
+    const numA = parseInt(a.assetCode.split('-').pop(), 10);
+    const numB = parseInt(b.assetCode.split('-').pop(), 10);
+
+    return numA - numB;
+  })
 
   const handleChange = (e) => {
     const { name, value, files } = e.target
@@ -65,7 +70,6 @@ const LandingPage = () => {
     data.append('fullName', form.fullName)
     data.append('email', form.email)
     data.append('laptopNumber', selectedLaptop)
-    data.append('siteLocation', form.siteLocation)
     data.append('issueType', form.issueType)
     data.append('customIssue', form.customIssue)
     data.append('priority', form.priority)
@@ -94,13 +98,13 @@ const LandingPage = () => {
       <div className="min-h-screen bg-white flex flex-col">
         <nav className="border-b border-gray-200 px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
-            🎫 DSCA IT Support
+            DSCA IT Support
           </div>
         </nav>
         <div className="flex-1 flex items-center justify-center px-6 py-16">
           <div className="text-center max-w-md">
             <div className="w-16 h-16 bg-green-50 border border-green-200 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-              ✅
+              
             </div>
             <h1 className="text-xl font-medium text-gray-900 mb-2">Ticket submitted!</h1>
             <p className="text-sm text-gray-500 mb-6">
@@ -118,7 +122,7 @@ const LandingPage = () => {
                 Track ticket
               </button>
               <button
-                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', siteLocation: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null) }}
+                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null) }}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700"
               >
                 Submit another
@@ -135,7 +139,7 @@ const LandingPage = () => {
       {/* Navbar */}
       <nav className="border-b border-gray-200 px-8 py-3.5 flex items-center justify-between sticky top-0 bg-white z-10">
         <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
-          🎫 DSCA IT Support
+           DSCA IT Support
         </div>
         <button
           onClick={() => navigate('/login')}
@@ -192,7 +196,7 @@ const LandingPage = () => {
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Laptop number</label>
               {selectedLaptop ? (
                 <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                  <span className="text-sm text-blue-700 font-medium flex-1">💻 {selectedLaptop}</span>
+                  <span className="text-sm text-blue-700 font-medium flex-1">{selectedLaptop}</span>
                   <button type="button" onClick={() => { setSelectedLaptop(null); setLaptopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
                 </div>
               ) : (
@@ -218,7 +222,6 @@ const LandingPage = () => {
                             className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer flex items-center justify-between"
                           >
                             <span>{l.assetCode}</span>
-                            {l.siteLocation && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{l.siteLocation}</span>}
                           </div>
                         ))
                       )}
@@ -226,19 +229,6 @@ const LandingPage = () => {
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Site location */}
-            <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Site location</label>
-              <select
-                name="siteLocation" value={form.siteLocation}
-                onChange={handleChange} required
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
-              >
-                <option value="">Select location...</option>
-                {SITE_LOCATIONS.map(s => <option key={s}>{s}</option>)}
-              </select>
             </div>
 
             {/* Issue type */}

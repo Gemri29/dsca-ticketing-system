@@ -18,7 +18,7 @@ export const submitTicket = async (req, res) => {
 
     const {
       fullName, email, laptopNumber,
-      siteLocation, issueType, customIssue, priority
+      issueType, customIssue, priority
     } = req.body
 
     // Verify laptop exists in DB
@@ -49,7 +49,6 @@ export const submitTicket = async (req, res) => {
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         laptopNumber,
-        siteLocation,
         issueType,
         customIssue: customIssue?.trim() || null,
         priority,
@@ -126,7 +125,7 @@ export const trackTicket = async (req, res) => {
 // ─────────────────────────────────────────────
 export const getTickets = async (req, res) => {
   const {
-    status, priority, siteLocation,
+    status, priority,
     issueType, assignedTo,
     sortBy = 'createdAt', order = 'desc',
     page = 1, limit = 25
@@ -141,7 +140,6 @@ export const getTickets = async (req, res) => {
 
   if (status) where.status = status.toUpperCase()
   if (priority) where.priority = priority.toUpperCase()
-  if (siteLocation) where.siteLocation = siteLocation
   if (issueType) where.issueType = issueType
   if (assignedTo && req.user.role === 'SUPER_ADMIN') where.assignedTo = assignedTo
 
@@ -330,7 +328,7 @@ export const getLaptops = async (req, res) => {
   try {
     const laptops = await prisma.laptop.findMany({
       where: { active: true },
-      select: { assetCode: true, siteLocation: true },
+      select: { assetCode: true },
       orderBy: { assetCode: 'asc' }
     })
 

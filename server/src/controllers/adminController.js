@@ -177,7 +177,6 @@ export const getAnalytics = async (req, res) => {
     const [
       totalTickets,
       byStatus,
-      bySiteLocation,
       byIssueType,
       byPriority,
       resolvedTickets,
@@ -188,11 +187,6 @@ export const getAnalytics = async (req, res) => {
         by: ['status'],
         where,
         _count: { status: true }
-      }),
-      prisma.ticket.groupBy({
-        by: ['siteLocation'],
-        where,
-        _count: { siteLocation: true }
       }),
       prisma.ticket.groupBy({
         by: ['issueType'],
@@ -273,7 +267,6 @@ export const getAnalytics = async (req, res) => {
       analytics: {
         totalTickets,
         byStatus: formatGroup(byStatus, 'status'),
-        bySiteLocation: formatGroup(bySiteLocation, 'siteLocation'),
         byIssueType: formatGroup(byIssueType, 'issueType'),
         byPriority: formatGroup(byPriority, 'priority'),
         avgResolutionTimeHours,

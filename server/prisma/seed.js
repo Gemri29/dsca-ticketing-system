@@ -29,29 +29,25 @@ async function main() {
   }
 
   // ── Laptop assets ─────────────────────────────
-  const laptops = [
-    { assetCode: 'DSCA-LAPTOP-001', siteLocation: 'Moe' },
-    { assetCode: 'DSCA-LAPTOP-002', siteLocation: 'Moe' },
-    { assetCode: 'DSCA-LAPTOP-003', siteLocation: 'Moe' },
-    { assetCode: 'DSCA-LAPTOP-004', siteLocation: 'Dubai Mall' },
-    { assetCode: 'DSCA-LAPTOP-005', siteLocation: 'Dubai Mall' },
-    { assetCode: 'DSCA-LAPTOP-006', siteLocation: 'Dubai Mall' },
-    { assetCode: 'DSCA-LAPTOP-007', siteLocation: 'ADCB' },
-    { assetCode: 'DSCA-LAPTOP-008', siteLocation: 'ADCB' },
-    { assetCode: 'DSCA-LAPTOP-009', siteLocation: 'ADCB' },
-    { assetCode: 'DSCA-LAPTOP-010', siteLocation: 'JBR' },
-    { assetCode: 'DSCA-LAPTOP-011', siteLocation: 'JBR' },
-    { assetCode: 'DSCA-LAPTOP-012', siteLocation: 'JBR' },
-  ]
+  const laptops = Array.from({ length: 1000 }, (_, index) => ({
+    assetCode: `DSCA-IT-L-${String(index + 1).padStart(3, '0')}`,
+  }));
+
+  await prisma.laptop.deleteMany()
 
   for (const laptop of laptops) {
     await prisma.laptop.upsert({
       where: { assetCode: laptop.assetCode },
-      update: {},
-      create: { ...laptop, active: true }
+      update: {
+        active: true
+      },
+      create: {
+        ...laptop,
+        active: true
+      }
     })
   }
-  console.log('✅ Laptop assets seeded (12 laptops)')
+  console.log('✅ Laptop assets seeded')
 
   console.log('🎉 Seeding complete!')
 }

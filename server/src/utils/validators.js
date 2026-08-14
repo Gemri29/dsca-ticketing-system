@@ -1,5 +1,5 @@
 const ALLOWED_DOMAINS = process.env.ALLOWED_EMAIL_DOMAINS?.split(',') || ['dscacontacting.com']
-const LAPTOP_REGEX = new RegExp(process.env.LAPTOP_NUMBER_REGEX || '^DSCA-LAPTOP-[0-9]{3}$')
+const LAPTOP_REGEX = new RegExp(process.env.LAPTOP_NUMBER_REGEX || '^DSCA-IT-L-[0-9]{3}$')
 
 export const validateEmail = (email) => {
   if (!email) return 'Email is required.'
@@ -13,7 +13,7 @@ export const validateEmail = (email) => {
 export const validateLaptopNumber = (laptopNumber) => {
   if (!laptopNumber) return 'Laptop number is required.'
   if (!LAPTOP_REGEX.test(laptopNumber)) {
-    return 'Invalid laptop number format. Expected: DSCA-LAPTOP-XXX'
+    return 'Invalid laptop number format. Expected: DSCA-IT-L-XXX'
   }
   return null
 }
@@ -29,7 +29,6 @@ export const validateTicketFields = (body) => {
   const laptopError = validateLaptopNumber(body.laptopNumber)
   if (laptopError) errors.laptopNumber = laptopError
 
-  if (!body.siteLocation?.trim()) errors.siteLocation = 'Site location is required.'
   if (!body.issueType?.trim()) errors.issueType = 'Issue type is required.'
 
   if (body.issueType === 'Other' && !body.customIssue?.trim()) {

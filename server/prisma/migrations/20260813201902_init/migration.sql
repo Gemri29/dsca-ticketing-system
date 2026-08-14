@@ -14,7 +14,6 @@ CREATE TABLE "Ticket" (
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "laptopNumber" TEXT NOT NULL,
-    "siteLocation" TEXT NOT NULL,
     "issueType" TEXT NOT NULL,
     "customIssue" TEXT,
     "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
