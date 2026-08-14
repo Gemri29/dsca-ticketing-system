@@ -150,11 +150,7 @@ export const getTickets = async (req, res) => {
 
   const where = {}
 
-  // Admins only see their own tickets; super admins see all
-  if (req.user.role === 'ADMIN') {
-    where.assignedTo = req.user.id
-  }
-
+  // All admins see all tickets — assignment is informational only
   if (status) where.status = status.toUpperCase()
   if (priority) where.priority = priority.toUpperCase()
   if (issueType) where.issueType = issueType
@@ -220,11 +216,6 @@ export const getTicketById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Ticket not found.' })
     }
 
-    // Admins can only view their assigned tickets
-    if (req.user.role === 'ADMIN' && ticket.assignedTo !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'You are not assigned to this ticket.' })
-    }
-
     return res.status(200).json({ success: true, ticket })
   } catch (err) {
     console.error('getTicketById error:', err)
@@ -244,10 +235,6 @@ export const updateTicket = async (req, res) => {
 
     if (!ticket) {
       return res.status(404).json({ success: false, message: 'Ticket not found.' })
-    }
-
-    if (req.user.role === 'ADMIN' && ticket.assignedTo !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'You are not assigned to this ticket.' })
     }
 
     const updateData = {}

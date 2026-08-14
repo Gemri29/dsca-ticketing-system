@@ -182,9 +182,9 @@ const Dashboard = () => {
           {/* Ticket list */}
           <div className="flex-1 bg-white border-t border-gray-200 overflow-auto">
             {/* List header */}
-            <div className="grid gap-0 px-5 py-2.5 border-b border-gray-100 bg-gray-50" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr' }}>
+            <div className="grid gap-0 px-5 py-2.5 border-b border-gray-100 bg-gray-50" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}>
               {['Submitter', 'Asset', 'Issue', 'Priority', 'Time'].map(h => (
-                <div key={h} className="text-[11px] font-medium text-gray-300 uppercase tracking-[0.04em]">{h}</div>
+                <div key={h} className="text-[11px] font-medium text-gray-300 uppercase tracking-[0.04em] min-w-0">{h}</div>
               ))}
             </div>
 
@@ -205,11 +205,11 @@ const Dashboard = () => {
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                     className="grid gap-0 px-5 py-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50/30 items-center transition-colors"
-                    style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr' }}
+                    style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}
                   >
-                    <div className="text-[13px] text-gray-800 font-medium truncate pr-2">{ticket.fullName}</div>
-                    <div className="text-[12px] text-gray-500 font-mono truncate pr-2">{assetLabel(ticket)}</div>
-                    <div className="pr-2">
+                    <div className="text-[13px] text-gray-800 font-medium truncate pr-2 min-w-0">{ticket.fullName}</div>
+                    <div className="text-[12px] text-gray-500 font-mono truncate pr-2 min-w-0">{assetLabel(ticket)}</div>
+                    <div className="pr-2 min-w-0 overflow-hidden">
                       <div className="text-[12px] text-gray-500 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
                       {sla && (
                         <div className="flex items-center gap-1 mt-0.5 text-[11px] text-red-500">

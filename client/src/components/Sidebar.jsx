@@ -12,6 +12,8 @@ const Sidebar = ({ counts = {} }) => {
 
   const isActive = (path) => location.pathname === path
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -157,7 +159,7 @@ const Sidebar = ({ counts = {} }) => {
           {!collapsed && <span className="text-[13px]">Settings</span>}
         </div>
         <div
-          onClick={handleLogout}
+          onClick={() => setShowLogoutModal(true)}
           className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-l-[3px] border-transparent text-red-400 hover:bg-red-50 transition-colors"
         >
           <svg className="w-[17px] h-[17px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,6 +168,30 @@ const Sidebar = ({ counts = {} }) => {
           {!collapsed && <span className="text-[13px]">Sign out</span>}
         </div>
       </div>
+
+      {/* Logout confirmation modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6 w-[320px]">
+            <div className="text-[15px] font-medium text-gray-900 mb-1">Sign out?</div>
+            <div className="text-[13px] text-gray-400 mb-5 leading-relaxed">You'll be logged out of your current session. Any unsaved changes will be lost.</div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 py-2 rounded-lg border border-gray-200 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 py-2 rounded-lg bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
