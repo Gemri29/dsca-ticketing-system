@@ -38,6 +38,15 @@ model User {
   updatedAt       DateTime @updatedAt
 }
 
+model Laptop {
+  id           String   @id @default(cuid())
+  assetCode    String   @unique
+  assignedTo   String?
+  siteLocation String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN
