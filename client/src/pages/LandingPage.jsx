@@ -28,9 +28,16 @@ const LandingPage = () => {
   })
 
   useEffect(() => {
+    console.log('Fetching laptops from:', import.meta.env.VITE_API_BASE_URL)
     getLaptops()
-      .then(res => setLaptops(res.laptops || []))
-      .catch(() => setLaptops([]))
+      .then(res => {
+        console.log('Laptops response:', res)
+        setLaptops(res.laptops || [])
+      })
+      .catch(err => {
+        console.error('Laptops fetch error:', err)
+        setLaptops([])
+      })
   }, [])
 
   const filteredLaptops = laptops.filter(l =>
@@ -288,7 +295,7 @@ const LandingPage = () => {
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Attachment <span className="text-gray-300 normal-case">(optional)</span></label>
               <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg py-4 px-3 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all bg-white">
-                <span className="text-xl mb-1">☁️</span>
+                <span className="text-xl mb-1 h-10 w-10"><img src='public/cloud-computing.png'></img></span>
                 <span className="text-xs text-gray-400">
                   {form.attachment ? form.attachment.name : 'Click to upload — JPG, PNG, PDF · max 5MB'}
                 </span>
