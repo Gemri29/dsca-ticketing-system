@@ -1,7 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import IdleWarningModal from './components/IdleWarningModal'
+import useIdleTimeout from './hooks/useIdleTimeout'
+import { logout } from './api/auth'
 
 import LandingPage from './pages/LandingPage'
 import TrackTicket from './pages/TrackTicket'
@@ -13,11 +17,46 @@ import Settings from './pages/admin/Settings'
 import Analytics from './pages/superadmin/Analytics'
 import AdminManagement from './pages/superadmin/AdminManagement'
 
+// Separate component so it can access AuthContext + useNavigate
+const IdleManager = () => {
+  const [warningVisible, setWarningVisible] = useState(false)
+  const { user, setUser } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogoutNow = async () => {
+    setWarningVisible(false)
+    try { await logout() } catch {}
+    setUser(null)
+    navigate('/login', { state: { idleLogout: true } })
+  }
+
+  const { resetTimers } = useIdleTimeout(
+    () => setWarningVisible(true),
+    () => setWarningVisible(false)
+  )
+
+  const handleStayLoggedIn = () => {
+    setWarningVisible(false)
+    resetTimers()
+  }
+
+  if (!user) return null
+
+  return (
+    <IdleWarningModal
+      visible={warningVisible}
+      onStayLoggedIn={handleStayLoggedIn}
+      onLogoutNow={handleLogoutNow}
+    />
+  )
+}
+
 const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Toaster position="top-right" />
+        <IdleManager />
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />

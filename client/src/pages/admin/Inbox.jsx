@@ -19,7 +19,6 @@ const PRIORITY_STYLES = {
   LOW: 'bg-gray-50 text-gray-500 border border-gray-200',
 }
 
-const SITES = ['Moe', 'Dubai Mall', 'ADCB', 'JBR']
 const STATUSES = ['PENDING', 'UNRESOLVED', 'RESOLVED']
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
 
@@ -35,15 +34,15 @@ const Inbox = () => {
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState({ status: [], priority: [], site: [] })
+  const [filters, setFilters] = useState({ status: [], priority: [] })
   const [sortOrder, setSortOrder] = useState('desc')
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [openGroups, setOpenGroups] = useState({ status: false, priority: false, site: false })
+  const [openGroups, setOpenGroups] = useState({ status: false, priority: false})
   const [selected, setSelected] = useState(new Set())
 
   const dropdownRef = useRef(null)
 
-  const activeFilterCount = filters.status.length + filters.priority.length + filters.site.length
+  const activeFilterCount = filters.status.length + filters.priority.length
 
   useEffect(() => {
     const handler = (e) => {
@@ -77,7 +76,6 @@ const Inbox = () => {
       // Client-side multi-value filter (API only supports single value)
       if (filters.status.length > 1) data = data.filter(t => filters.status.includes(t.status))
       if (filters.priority.length > 1) data = data.filter(t => filters.priority.includes(t.priority))
-      if (filters.site.length) data = data.filter(t => filters.site.includes(t.siteName))
       if (search.trim()) {
         const q = search.toLowerCase()
         data = data.filter(t =>
@@ -125,7 +123,7 @@ const Inbox = () => {
   const removeChip = (group, value) => toggleFilter(group, value)
 
   const clearAll = () => {
-    setFilters({ status: [], priority: [], site: [] })
+    setFilters({ status: [], priority: []})
     setPage(1)
   }
 
@@ -148,13 +146,12 @@ const Inbox = () => {
   const chipLabel = (group, value) => {
     if (group === 'status') return `Status: ${value.charAt(0) + value.slice(1).toLowerCase()}`
     if (group === 'priority') return `Priority: ${value.charAt(0) + value.slice(1).toLowerCase()}`
-    return `Site: ${value}`
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
       {/* Topbar */}
-      <div className="bg-white border-b border-gray-200 h-[52px] flex items-center justify-between px-5 flex-shrink-0">
+      <div className="bg-white border-b border-gray-200 h-[52px] flex items-center justify-between px-5 flex-shrink-0 pl-16">
         <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
@@ -225,7 +222,6 @@ const Inbox = () => {
                     {[
                       { key: 'status', label: 'Status', options: STATUSES, display: v => v.charAt(0) + v.slice(1).toLowerCase() },
                       { key: 'priority', label: 'Priority', options: PRIORITIES, display: v => v.charAt(0) + v.slice(1).toLowerCase() },
-                      { key: 'site', label: 'Site', options: SITES, display: v => v },
                     ].map(group => (
                       <div key={group.key} className="border-b border-gray-100 last:border-0">
                         <button
@@ -281,7 +277,7 @@ const Inbox = () => {
             {/* Active filter chips */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {['status', 'priority', 'site'].flatMap(group =>
+                {['status', 'priority'].flatMap(group =>
                   filters[group].map(value => (
                     <div key={`${group}-${value}`} className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-full px-2.5 py-0.5 text-[11px] font-medium">
                       {chipLabel(group, value)}
@@ -315,7 +311,7 @@ const Inbox = () => {
             <div className="grid px-5 py-2.5 border-b border-gray-100 bg-gray-50 items-center" style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}>
               <div />
               {['Submitter', 'Asset', 'Issue', 'Site', 'Status', 'Priority'].map(h => (
-                <div key={h} className="text-[11px] font-medium text-gray-300 uppercase tracking-[0.04em]">{h}</div>
+                <div key={h} className="text-[12px] font-medium text-gray-300 uppercase tracking-[0.04em]">{h}</div>
               ))}
             </div>
 
@@ -336,13 +332,14 @@ const Inbox = () => {
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                     className="grid px-5 py-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50/20 items-center transition-colors"
-                    style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}
-                  >
+                    style={{ gridTemplateColumns: '24px minmax(0,2fr) minmax(0,1.3fr) minmax(0,2.2fr) 1fr 1fr 1fr' }}
+                    >
                     <div onClick={e => { e.stopPropagation(); toggleSelect(ticket.id) }}>
                       <div className={`w-3.5 h-3.5 rounded border-[1.5px] flex-shrink-0 ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-white'}`} />
                     </div>
-                    <div>
-                      <div className="text-[13px] text-gray-800 font-medium truncate">{ticket.fullName}</div>
+                    <div className="py-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50/30 items-center transition-colors"
+                    >
+                      <div className="text-[13px] text-gray-800 font-medium truncate min-w-0">{ticket.fullName}</div>
                       <div className="text-[11px] text-gray-300 font-mono">{ticket.ticketCode}</div>
                     </div>
                     <div className="text-[12px] text-gray-500 font-mono truncate pr-2">{assetLabel(ticket)}</div>

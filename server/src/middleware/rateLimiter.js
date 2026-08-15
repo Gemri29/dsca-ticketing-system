@@ -9,9 +9,9 @@ export const submitLimiter = rateLimit({
 })
 
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_LOGIN_MAX) || 10,
-  message: { success: false, message: 'Too many login attempts. Please try again in 15 minutes.' },
+  windowMs: 10 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_LOGIN_MAX) || 5,
+  message: { success: false, message: 'Too many login attempts. Please try again in 10 minutes.' },
   standardHeaders: true,
   legacyHeaders: false
 })

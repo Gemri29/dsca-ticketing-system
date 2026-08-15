@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { login } from '../api/auth'
@@ -7,10 +7,20 @@ import toast from 'react-hot-toast'
 const LoginPage = () => {
   const { setUser } = useAuth()
   const navigate = useNavigate()
+  const [wasIdleLoggedOut, setWasIdleLoggedOut] = useState(
+    () => sessionStorage.getItem('idleLogout') === 'true'
+  )
+  useEffect(() => {
+    if (wasIdleLoggedOut) {
+      sessionStorage.removeItem('idleLogout')
+    }
+  }, [wasIdleLoggedOut])
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [showRateWarning, setShowRateWarning] = useState(false)
+  const [failedAttempts, setFailedAttempts] = useState(0)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -31,6 +41,17 @@ const LoginPage = () => {
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed.'
       toast.error(msg)
+      if (status === 429) {
+        // Account is now locked — stop counting, show locked state
+        setShowRateWarning(true)
+        setFailedAttempts(5)
+      } else {
+        setFailedAttempts(prev => {
+          const next = prev + 1
+          if (next >= 3) setShowRateWarning(true)
+          return next
+        })
+      }
     } finally {
       setSubmitting(false)
     }
@@ -74,6 +95,16 @@ const LoginPage = () => {
             </svg>
             IT staff and super admins only
           </div>
+
+          {wasIdleLoggedOut && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3.5 py-2.5 mb-4 text-[12px] text-amber-700">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            You were signed out due to inactivity.
+          </div>
+          )}
+          
 
           <form onSubmit={handleSubmit}>
             {/* Email */}
@@ -124,12 +155,19 @@ const LoginPage = () => {
             </div>
 
             {/* Rate limit warning */}
+            {showRateWarning && (
             <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5 mb-4">
               <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-[12px] text-amber-700 leading-relaxed">10 failed attempts will lock this account for 15 minutes.</p>
+              <p className="text-[12px] text-amber-700 leading-relaxed">
+              {failedAttempts >= 5
+                ? 'Account locked. Please try again in 10 minutes.'
+                : `${5 - failedAttempts} attempt${5 - failedAttempts !== 1 ? 's' : ''} remaining before your account is locked for 10 minutes.`
+              }
+            </p>
             </div>
+            )}
 
             <button
               type="submit"

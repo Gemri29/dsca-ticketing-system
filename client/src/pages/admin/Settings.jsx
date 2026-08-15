@@ -136,7 +136,7 @@ const Settings = () => {
 
       <div className="flex-1 overflow-auto">
         {/* Topbar */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10 pl-16">
           <div>
             <h1 className="text-base font-medium text-gray-900">Account Settings</h1>
             <p className="text-xs text-gray-400">Manage your profile, password, and account preferences.</p>

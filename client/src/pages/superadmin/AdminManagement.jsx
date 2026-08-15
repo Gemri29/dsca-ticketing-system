@@ -115,7 +115,7 @@ const AdminManagement = () => {
 
       <div className="flex-1 overflow-auto">
         {/* Topbar */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10 pl-16">
           <div>
             <h1 className="text-base font-medium text-gray-900">Admin Management</h1>
             <p className="text-xs text-gray-400">
@@ -307,7 +307,11 @@ const AdminManagement = () => {
                       onClick={() => setShowPw(p => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-sm"
                     >
-                      {showPw ? '🙈' : '👁'}
+                    {showPw ? (
+                    <img src="/show.png" alt="Hide password" className="w-5 h-5" />
+                    ) : (
+                    <img src="/hidden.png" alt="Show password" className="w-5 h-5" />
+                    )}
                     </button>
                   </div>
                 </div>
