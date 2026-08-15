@@ -1,21 +1,53 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
-import { updateMe, getMe } from '../../api/auth'
-import { logout } from '../../api/auth'
+import { updateMe, logout } from '../../api/auth'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 
-  const Settings = () => {
+const PwField = ({ label, name, pwKey, value, onChange, showPw, setShowPw }) => (
+  <div>
+    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</label>
+    <div className="relative">
+      <input
+        type={showPw[pwKey] ? 'text' : 'password'}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={`Enter ${label.toLowerCase()}`}
+        className="w-full px-3 py-2 pr-10 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+      />
+      <button
+          type="button"
+          onClick={() => setShowPw(prev => ({ ...prev, [pwKey]: !prev[pwKey] }))}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-sm"
+        >
+          {showPw[pwKey] ? (
+            <img src="/show.png" alt="Hide password" className="w-5 h-5" />
+            ) : (
+            <img src="/hidden.png" alt="Show password" className="w-5 h-5" />
+            )}
+        </button>
+
+
+    </div>
+  </div>
+)
+
+const Settings = () => {
   const { user, setUser } = useAuth()
   const navigate = useNavigate()
 
   const [profileForm, setProfileForm] = useState({ name: '', email: '' })
-  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '', newPassword: '', confirmPassword: ''
+  })
   const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false })
   const [savingProfile, setSavingProfile] = useState(false)
   const [savingPassword, setSavingPassword] = useState(false)
-  const [stats, setStats] = useState({ assigned: 0, resolved: 0, avgTime: 0, joined: '', lastLogin: '' })
+  const [stats, setStats] = useState({
+    assigned: 0, resolved: 0, avgTime: 0, joined: '', lastLogin: ''
+  })
 
   useEffect(() => {
     if (user) {
@@ -82,15 +114,7 @@ import Sidebar from '../../components/Sidebar'
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      setUser(null)
-      navigate('/login')
-    } catch {
-      toast.error('Failed to sign out.')
-    }
-  }
+  
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '—'
@@ -98,35 +122,14 @@ import Sidebar from '../../components/Sidebar'
       day: 'numeric', month: 'short', year: 'numeric'
     })
   }
-  const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AD'
-  
-  const PwField = ({ label, name, pwKey }) => (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</label>
-      <div className="relative">
-        <input
-          type={showPw[pwKey] ? 'text' : 'password'}
-          name={name}
-          value={passwordForm[name]}
-          onChange={handlePasswordChange}
-          placeholder={`Enter ${label.toLowerCase()}`}
-          className="w-full px-3 py-2 pr-10 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
-        />
-        <button
-          type="button"
-          onClick={() => setShowPw(prev => ({ ...prev, [pwKey]: !prev[pwKey] }))}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-sm"
-        >
-          {showPw[pwKey] ? (
-            <img src="/show.png" alt="Hide password" className="w-5 h-5" />
-            ) : (
-            <img src="/hidden.png" alt="Show password" className="w-5 h-5" />
-            )}
-        </button>
-      </div>
-    </div>
-  )
-  
+
+  const initials = user?.name
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'AD'
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
@@ -144,7 +147,6 @@ import Sidebar from '../../components/Sidebar'
 
           {/* Profile card */}
           <div className="bg-white border border-gray-200 rounded-xl p-6">
-            {/* Avatar row */}
             <div className="flex items-center gap-4 pb-5 border-b border-gray-100 mb-5">
               <div className="w-14 h-14 rounded-full bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-lg font-medium text-blue-600 flex-shrink-0">
                 {initials}
@@ -153,19 +155,16 @@ import Sidebar from '../../components/Sidebar'
                 <p className="text-base font-medium text-gray-900">{user?.name}</p>
                 <p className="text-sm text-gray-400">{user?.email}</p>
                 <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200">
-                {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin (IT)'}
+                  {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin (IT)'}
                 </span>
               </div>
             </div>
 
-            {/* Profile fields */}
             <div className="grid grid-cols-2 gap-4 mb-5">
               <div>
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Full name</label>
                 <input
-                  type="text"
-                  name="name"
-                  value={profileForm.name}
+                  type="text" name="name" value={profileForm.name}
                   onChange={handleProfileChange}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
                 />
@@ -173,9 +172,7 @@ import Sidebar from '../../components/Sidebar'
               <div>
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={profileForm.email}
+                  type="email" name="email" value={profileForm.email}
                   onChange={handleProfileChange}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
                 />
@@ -194,9 +191,7 @@ import Sidebar from '../../components/Sidebar'
               <div>
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Account status</label>
                 <input
-                  type="text"
-                  value="Active"
-                  disabled
+                  type="text" value="Active" disabled
                   className="w-full px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 text-sm text-green-500 font-medium cursor-not-allowed"
                 />
               </div>
@@ -224,21 +219,23 @@ import Sidebar from '../../components/Sidebar'
 
             {/* Change password */}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
-                Change password
-              </h3>
-              <div className="space-y-3 mb-5">
-               <PwField label="Current password" name="currentPassword" pwKey="current"
-                value={passwordForm.currentPassword} onChange={handlePasswordChange}
-                showPw={showPw} setShowPw={setShowPw} />
-
-                <PwField label="New password" name="newPassword" pwKey="new"
-                value={passwordForm.newPassword} onChange={handlePasswordChange}
-                showPw={showPw} setShowPw={setShowPw} />
-
-                <PwField label="Confirm new password" name="confirmPassword" pwKey="confirm"
-                value={passwordForm.confirmPassword} onChange={handlePasswordChange}
-                showPw={showPw} setShowPw={setShowPw} />
+              <h3 className="text-sm font-medium text-gray-900 mb-4">Change password</h3>
+              <div className="space-y-3 mb-4">
+                <PwField
+                  label="Current password" name="currentPassword" pwKey="current"
+                  value={passwordForm.currentPassword} onChange={handlePasswordChange}
+                  showPw={showPw} setShowPw={setShowPw}
+                />
+                <PwField
+                  label="New password" name="newPassword" pwKey="new"
+                  value={passwordForm.newPassword} onChange={handlePasswordChange}
+                  showPw={showPw} setShowPw={setShowPw}
+                />
+                <PwField
+                  label="Confirm new password" name="confirmPassword" pwKey="confirm"
+                  value={passwordForm.confirmPassword} onChange={handlePasswordChange}
+                  showPw={showPw} setShowPw={setShowPw}
+                />
               </div>
               <p className="text-xs text-gray-300 mb-4">Min 8 characters · 1 number · 1 special character</p>
               <div className="flex justify-end">
@@ -254,10 +251,8 @@ import Sidebar from '../../components/Sidebar'
 
             {/* Account info */}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
-                Account info
-              </h3>
-              <div className="space-y-3">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">Account info</h3>
+              <div className="space-y-1">
                 {[
                   { label: 'Member since', value: formatDate(user?.createdAt) },
                   { label: 'Last login', value: 'This session' },
@@ -265,7 +260,7 @@ import Sidebar from '../../components/Sidebar'
                   { label: 'Tickets resolved', value: stats.resolved || '—' },
                   { label: 'Avg. resolution time', value: stats.avgTime ? `${stats.avgTime}h` : '—' }
                 ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div key={label} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
                     <span className="text-xs text-gray-400">{label}</span>
                     <span className="text-sm font-medium text-gray-800">{value}</span>
                   </div>
@@ -273,7 +268,6 @@ import Sidebar from '../../components/Sidebar'
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

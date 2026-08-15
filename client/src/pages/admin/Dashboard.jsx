@@ -86,6 +86,12 @@ const Dashboard = () => {
     }
     fetchTickets()
   }, [activeFilter])
+  useEffect(() => {
+    const status = searchParams.get('status')?.toUpperCase()
+    if (status && STATUS_FILTERS.includes(status)) {
+      setActiveFilter(status)
+    }
+  }, [searchParams])
 
   const setFilter = (status) => {
     setActiveFilter(status)
