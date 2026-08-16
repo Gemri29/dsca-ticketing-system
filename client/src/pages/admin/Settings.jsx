@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { updateMe, logout } from '../../api/auth'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
+import usePageTitle from '../../hooks/usePageTitle'
 
 const PwField = ({ label, name, pwKey, value, onChange, showPw, setShowPw }) => (
   <div>
@@ -35,6 +36,7 @@ const PwField = ({ label, name, pwKey, value, onChange, showPw, setShowPw }) => 
 )
 
 const Settings = () => {
+  usePageTitle('Settings')
   const { user, setUser } = useAuth()
   const navigate = useNavigate()
 

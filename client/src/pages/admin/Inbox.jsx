@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar'
 import { getTickets } from '../../api/tickets'
 import { formatTimeAgo, isSLABreached } from '../../utils/formatters'
 import toast from 'react-hot-toast'
+import usePageTitle from '../../hooks/usePageTitle'
 
 const STATUS_STYLES = {
   PENDING: 'bg-orange-50 text-orange-600 border border-orange-200',
@@ -25,6 +26,7 @@ const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
 const PAGE_SIZE = 25
 
 const Inbox = () => {
+  usePageTitle('Inbox')
   const { user } = useAuth()
   const navigate = useNavigate()
 

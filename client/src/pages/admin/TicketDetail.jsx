@@ -8,8 +8,10 @@ import Sidebar from '../../components/Sidebar'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
 import { formatDateTime, formatTimeAgo, isSLABreached } from '../../utils/formatters'
+import usePageTitle from '../../hooks/usePageTitle'
 
 const TicketDetail = () => {
+  usePageTitle ('Ticket Detail')
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()

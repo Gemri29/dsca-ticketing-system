@@ -3,10 +3,12 @@ import { getAdminUsers, createAdminUser, updateAdminUser } from '../../api/admin
 import { useAuth } from '../../context/AuthContext'
 import Sidebar from '../../components/Sidebar'
 import toast from 'react-hot-toast'
+import usePageTitle from '../../hooks/usePageTitle'
 
 const EMPTY_FORM = { name: '', email: '', password: '', role: 'ADMIN' }
 
 const AdminManagement = () => {
+  usePageTitle ('Admin Management')
   const { user } = useAuth()
   const [admins, setAdmins] = useState([])
   const [loading, setLoading] = useState(true)

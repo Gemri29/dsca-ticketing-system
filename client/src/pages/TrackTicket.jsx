@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { trackTicket } from '../api/tickets'
 import { formatDateTime, formatStatus, formatPriority } from '../utils/formatters'
+import usePageTitle from '../hooks/usePageTitle'
 
 const STATUS_STYLES = {
   PENDING:    'bg-orange-50 text-orange-600 border border-orange-200',
@@ -18,6 +19,7 @@ const PRIORITY_STYLES = {
 }
 
 const TrackTicket = () => {
+  usePageTitle('Track My Ticket')
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', ticketCode: '' })
   const [loading, setLoading] = useState(false)
@@ -59,12 +61,6 @@ const TrackTicket = () => {
       <nav className="border-b border-gray-200 px-8 py-3.5 flex items-center justify-between sticky top-0 bg-white z-10">
         <button onClick={() => navigate('/')} className="text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors">
           ← DSCA IT Support
-        </button>
-        <button
-          onClick={() => navigate('/login')}
-          className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-        >
-          Admin login ↗
         </button>
       </nav>
 

@@ -4,9 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import Sidebar from '../../components/Sidebar'
 import { getTickets } from '../../api/tickets'
 import { formatTimeAgo, isSLABreached } from '../../utils/formatters'
-
-
-
+import usePageTitle from '../../hooks/usePageTitle'
 
 const STATUS_FILTERS = ['PENDING', 'UNRESOLVED', 'RESOLVED']
 
@@ -42,6 +40,7 @@ const STAT_ICONS = {
 }
 
 const Dashboard = () => {
+  usePageTitle('Dashboard')
   const { user } = useAuth()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()

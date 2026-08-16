@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { login } from '../api/auth'
 import toast from 'react-hot-toast'
+import usePageTitle from '../hooks/usePageTitle'
 
 const LoginPage = () => {
+  usePageTitle('Log In')
   const { setUser } = useAuth()
   const navigate = useNavigate()
   const [wasIdleLoggedOut, setWasIdleLoggedOut] = useState(
