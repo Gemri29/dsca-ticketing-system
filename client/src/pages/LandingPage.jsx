@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { submitTicket, getLaptops, getDesktops } from '../api/tickets'
 
 
-const ISSUE_TYPES = ['Internet Issue', 'Account Issue', 'Hardware Issue', 'Software Issue', 'New Email', 'Email reset Password', 'Sim Card Request', 'Server Access', ' CCTV Installation', 'Wifi Installation', 'Printer Maintenance', 'Printer Toner', 'Other']
+const ISSUE_TYPES = ['Internet Issue', 'Hardware Issue', 'Software Issue', 'New Email', 'Email reset Password', 'Sim Card Request', 'Server Access', ' CCTV Installation', 'Wifi Installation', 'Printer Maintenance', 'Printer Toner', 'Other']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
 const LandingPage = () => {
@@ -309,7 +309,7 @@ const LandingPage = () => {
                 onChange={handleChange} required
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               >
-                <option value="">Select issue...</option>
+                <option value="">Select issue</option>
                 {ISSUE_TYPES.map(i => <option key={i}>{i}</option>)}
               </select>
             </div>
