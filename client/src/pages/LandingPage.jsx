@@ -163,12 +163,6 @@ const LandingPage = () => {
         <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
            DSCA IT Support
         </div>
-        <button
-          onClick={() => navigate('/login')}
-          className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-        >
-          Admin login ↗
-        </button>
       </nav>
 
       {/* Hero */}
