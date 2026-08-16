@@ -98,3 +98,80 @@ export const sendStatusUpdateEmail = async ({ to, fullName, ticketCode, status, 
     `
   })
 }
+export const sendTicketAssignedEmail = async ({ to, adminName, ticketCode, fullName, issueType, customIssue, priority, siteLocation, ticketId }) => {
+  const ticketUrl = `${process.env.FRONTEND_URL}/admin/tickets/${ticketId}`
+  const issueDisplay = issueType === 'Other' && customIssue ? `Other — ${customIssue}` : issueType
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: `[${ticketCode}] New support ticket submitted — ${issueDisplay}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+        <div style="background:#2563eb;padding:24px 32px;border-radius:12px 12px 0 0">
+          <h1 style="color:#fff;margin:0;font-size:20px">DSCA IT Support</h1>
+        </div>
+        <div style="background:#f8faff;padding:32px;border:1px solid #e8eef8;border-top:none;border-radius:0 0 12px 12px">
+          <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
+          <p style="margin:0 0 24px;color:#555">A new support ticket has been submitted and requires attention.</p>
+          <div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:20px;margin-bottom:24px">
+            <div style="text-align:center;margin-bottom:16px">
+              <span style="font-size:24px;font-weight:600;color:#2563eb">${ticketCode}</span>
+            </div>
+            <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0" />
+            <table style="width:100%;font-size:13px">
+              <tr><td style="color:#888;padding:4px 0">Submitted by</td><td style="font-weight:500">${fullName}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Issue</td><td style="font-weight:500">${issueDisplay}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Priority</td><td style="font-weight:500">${priority}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Site</td><td style="font-weight:500">${siteLocation}</td></tr>
+            </table>
+          </div>
+          <a href="${ticketUrl}" style="display:block;text-align:center;background:#2563eb;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:500">
+            View ticket →
+          </a>
+        </div>
+      </div>
+    `
+  })
+}
+
+export const sendSLABreachEmail = async ({ to, adminName, ticketCode, fullName, issueType, customIssue, priority, siteLocation, hoursElapsed, ticketId }) => {
+  const ticketUrl = `${process.env.FRONTEND_URL}/admin/tickets/${ticketId}`
+  const issueDisplay = issueType === 'Other' && customIssue ? `Other — ${customIssue}` : issueType
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: `⚠️ [${ticketCode}] SLA Breach — Immediate attention required`,
+    html: `
+      <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+        <div style="background:#ef4444;padding:24px 32px;border-radius:12px 12px 0 0">
+          <h1 style="color:#fff;margin:0;font-size:20px">⚠️ SLA Breach Alert</h1>
+        </div>
+        <div style="background:#fff8f8;padding:32px;border:1px solid #fecaca;border-top:none;border-radius:0 0 12px 12px">
+          <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
+          <p style="margin:0 0 24px;color:#555">
+            A ticket has exceeded the <strong>48-hour SLA threshold</strong> 
+            and has been open for <strong>${hoursElapsed} hours</strong> without resolution.
+          </p>
+          <div style="background:#fff;border:1px solid #fecaca;border-radius:8px;padding:20px;margin-bottom:24px">
+            <div style="text-align:center;margin-bottom:16px">
+              <span style="font-size:24px;font-weight:600;color:#ef4444">${ticketCode}</span>
+              <p style="margin:4px 0 0;font-size:12px;color:#ef4444">${hoursElapsed} hours overdue</p>
+            </div>
+            <hr style="border:none;border-top:1px solid #fee2e2;margin:16px 0" />
+            <table style="width:100%;font-size:13px">
+              <tr><td style="color:#888;padding:4px 0">Submitted by</td><td style="font-weight:500">${fullName}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Issue</td><td style="font-weight:500">${issueDisplay}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Priority</td><td style="font-weight:500">${priority}</td></tr>
+              <tr><td style="color:#888;padding:4px 0">Site</td><td style="font-weight:500">${siteLocation}</td></tr>
+            </table>
+          </div>
+          <a href="${ticketUrl}" style="display:block;text-align:center;background:#ef4444;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:500">
+            Resolve ticket now →
+          </a>
+        </div>
+      </div>
+    `
+  })
+}

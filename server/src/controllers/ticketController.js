@@ -1,7 +1,7 @@
 import prisma from '../utils/prismaClient.js'
 import generateTicketCode from '../services/ticketCodeService.js'
 import uploadFile from '../services/uploadService.js'
-import { sendConfirmationEmail, sendStatusUpdateEmail } from '../services/emailService.js'
+import { sendConfirmationEmail, sendStatusUpdateEmail, sendTicketAssignedEmail } from '../services/emailService.js'
 import { validateTicketFields } from '../utils/validators.js'
 import publicTicketShape from '../utils/publicTicketShape.js'
 
@@ -85,10 +85,33 @@ export const submitTicket = async (req, res) => {
         siteName: ticket.siteName
       })
     } catch (emailErr) {
-      // Don't fail the request if email fails — log and continue
       console.error('Confirmation email failed:', emailErr)
     }
-
+    
+    // Notify all active admins
+    try {
+      const admins = await prisma.user.findMany({
+        where: { active: true },
+        select: { email: true, name: true }
+      })
+      await Promise.allSettled(
+        admins.map(admin =>
+          sendTicketAssignedEmail({
+            to: admin.email,
+            adminName: admin.name,
+            ticketCode: ticket.ticketCode,
+            fullName: ticket.fullName,
+            issueType: ticket.issueType,
+            customIssue: ticket.customIssue,
+            priority: ticket.priority,
+            siteLocation: ticket.siteName,
+            ticketId: ticket.id
+          })
+        )
+      )
+    } catch (emailErr) {
+      console.error('Admin notification emails failed:', emailErr)
+    }
     return res.status(201).json({
       success: true,
       message: 'Ticket submitted successfully.',

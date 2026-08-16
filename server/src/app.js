@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/auth.js'
 import ticketRoutes from './routes/tickets.js'
 import adminRoutes from './routes/admin.js'
+import { startSLACronJob } from './services/slaService.js'
 
 dotenv.config()
 
@@ -44,5 +45,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({ success: false, message: 'Internal server error.' })
 })
+// Start SLA breach monitoring
+startSLACronJob()
 
 export default app

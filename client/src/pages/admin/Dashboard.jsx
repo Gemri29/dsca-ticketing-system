@@ -40,7 +40,7 @@ const STAT_ICONS = {
 }
 
 const Dashboard = () => {
-  usePageTitle('Dashboard')
+  usePageTitle('Admin Dashboard')
   const { user } = useAuth()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()

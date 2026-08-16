@@ -23,6 +23,7 @@ model Ticket {
   internalNote String?
   assignedTo   String?
   assignedUser User?    @relation(fields: [assignedTo], references: [id])
+  slaEmailSent Boolean  @default(false)    
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
