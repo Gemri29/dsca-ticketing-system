@@ -36,7 +36,7 @@ const PwField = ({ label, name, pwKey, value, onChange, showPw, setShowPw }) => 
 )
 
 const Settings = () => {
-  usePageTitle('Settings')
+  usePageTitle('Account Settings')
   const { user, setUser } = useAuth()
   const navigate = useNavigate()
 

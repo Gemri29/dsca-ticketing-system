@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { submitTicket, getLaptops, getDesktops } from '../api/tickets'
+import usePageTitle from '../hooks/usePageTitle'
 
 const ISSUE_TYPES = ['Internet Issue', 'Hardware Issue', 'Software Issue', 'New Email', 'Email reset Password', 'Sim Card Request', 'Server Access', ' CCTV Installation', 'Wifi Installation', 'Printer Maintenance', 'Printer Toner', 'Other']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
 const LandingPage = () => {
+  usePageTitle('Submit Ticket')
   const navigate = useNavigate()
   const [laptops, setLaptops] = useState([])
   const [laptopQuery, setLaptopQuery] = useState('')
