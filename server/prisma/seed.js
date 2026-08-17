@@ -8,39 +8,50 @@ async function main() {
   console.log('🌱 Seeding database...')
 
   // ── Super Admin ───────────────────────────────
+const seedEmail = process.env.SEED_ADMIN_EMAIL
+const seedPassword = process.env.SEED_ADMIN_PASSWORD
+
+if (!seedEmail || !seedPassword) {
+  console.log('⚠️ SEED_ADMIN_EMAIL or SEED_ADMIN_PASSWORD not set — skipping Super Admin seed')
+} else {
   const existing = await prisma.user.findUnique({
-    where: { email: 'super_admin@dscacontracting.com' }
+    where: { email: seedEmail }
   })
 
   if (!existing) {
-    const seedEmail = process.env.SEED_ADMIN_EMAIL || 'super_admin@dscacontracting.com'
-    const seedPassword = process.env.SEED_ADMIN_PASSWORD || 'heisenberg'
     const hashedPassword = await bcrypt.hash(seedPassword, 12)
-  await prisma.user.create({
-  data: {
-    name: 'Super Admin',
-    email: seedEmail,
-    password: hashedPassword,
-    role: 'SUPER_ADMIN',
-    active: true
-  }
-})
+    await prisma.user.create({
+      data: {
+        name: 'Super Admin',
+        email: seedEmail,
+        password: hashedPassword,
+        role: 'SUPER_ADMIN',
+        active: true
+      }
+    })
     console.log('✅ Super Admin created')
   } else {
-    console.log('⏭️  Super Admin already exists — skipping')
+    console.log('⏭️ Super Admin already exists — skipping')
   }
+}
 
-  // ── Test Admin ──────────────────────────────────
+// ── Test Admin ────────────────────────────────
+const testEmail = process.env.SEED_TEST_ADMIN_EMAIL
+const testPassword = process.env.SEED_TEST_ADMIN_PASSWORD
+
+if (!testEmail || !testPassword) {
+  console.log('⚠️ SEED_TEST_ADMIN_EMAIL or SEED_TEST_ADMIN_PASSWORD not set — skipping Test Admin seed')
+} else {
   const existingAdmin = await prisma.user.findUnique({
-    where: { email: 'admin@dscacontracting.com' }
+    where: { email: testEmail }
   })
 
   if (!existingAdmin) {
-    const adminHash = await bcrypt.hash('Admin@1234', 12)
+    const adminHash = await bcrypt.hash(testPassword, 12)
     await prisma.user.create({
       data: {
         name: 'Test Admin',
-        email: 'admin@dscacontracting.com',
+        email: testEmail,
         password: adminHash,
         role: 'ADMIN',
         active: true
@@ -48,8 +59,9 @@ async function main() {
     })
     console.log('✅ Test Admin created')
   } else {
-    console.log('⏭️  Test Admin already exists — skipping')
+    console.log('⏭️ Test Admin already exists — skipping')
   }
+}
 
   // ── Laptop assets ─────────────────────────────
   const laptops = Array.from({ length: 1000 }, (_, index) => ({
