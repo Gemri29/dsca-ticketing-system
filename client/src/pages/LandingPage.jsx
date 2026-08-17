@@ -58,6 +58,15 @@ const LandingPage = () => {
     return numA - numB;
   })
 
+  useEffect(() => {
+    if (form.issueType === 'Sim Card Request') {
+      setSelectedLaptop(null)
+      setSelectedDesktop(null)
+      setLaptopQuery('')
+      setDesktopQuery('')
+    }
+  }, [form.issueType])
+  
   const filteredDesktops = desktops.filter(d =>
     d.assetCode.toLowerCase().includes(desktopQuery.toLowerCase())
   ).sort((a, b) => {
@@ -78,7 +87,7 @@ const LandingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!selectedLaptop && !selectedDesktop) {
+    if (form.issueType !== 'Sim Card Request' && !selectedLaptop && !selectedDesktop) {
       toast.error('Please select a laptop or desktop number.')
       return
     }
@@ -219,8 +228,7 @@ const LandingPage = () => {
                   <button type="button" onClick={() => { setSelectedLaptop(null); setLaptopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
                 </div>
               ) : (
-                <div className="relative">
-                  <input
+              <div className={form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}>                  <input
                     type="text"
                     value={laptopQuery}
                     onChange={e => { setLaptopQuery(e.target.value); setLaptopDropdownOpen(true) }}
@@ -259,7 +267,7 @@ const LandingPage = () => {
                   <button type="button" onClick={() => { setSelectedDesktop(null); setDesktopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
                 </div>
               ) : (
-                <div className="relative">
+                <div className={selectedLaptop || form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}>
                   <input
                     type="text"
                     value={desktopQuery}
@@ -315,6 +323,15 @@ const LandingPage = () => {
               </select>
             </div>
 
+            {/* Sim Card Request notice */}
+            {form.issueType === 'Sim Card Request' && (
+              <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3.5 py-2.5 text-[12px] text-blue-700">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Laptop and desktop fields are not required for Sim Card Requests.
+              </div>
+            )}
             {/* Custom issue */}
             {form.issueType === 'Other' && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
