@@ -184,8 +184,7 @@ const LandingPage = () => {
       </div>
 
       {/* Main */}
-      <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-
+      <div className="flex-1 max-w-none w-full px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Form card */}
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
           <h2 className="text-base font-medium text-gray-900 mb-1">New support request</h2>
@@ -376,7 +375,7 @@ const LandingPage = () => {
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Attachment <span className="text-gray-300 normal-case">(optional)</span></label>
               <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg py-4 px-3 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all bg-white">
                 <span className="text-xl mb-1 h-10 w-10">
-                  <svg> <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="File / Cloud_Upload"> <path id="Vector" d="M12 16V10M12 10L9 12M12 10L15 12M23 15C23 12.7909 21.2091 11 19 11C18.9764 11 18.9532 11.0002 18.9297 11.0006C18.4447 7.60802 15.5267 5 12 5C9.20335 5 6.79019 6.64004 5.66895 9.01082C3.06206 9.18144 1 11.3498 1 13.9999C1 16.7613 3.23858 19.0001 6 19.0001L19 19C21.2091 19 23 17.2091 23 15Z" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg> </svg>
+                 <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="File / Cloud_Upload"> <path id="Vector" d="M12 16V10M12 10L9 12M12 10L15 12M23 15C23 12.7909 21.2091 11 19 11C18.9764 11 18.9532 11.0002 18.9297 11.0006C18.4447 7.60802 15.5267 5 12 5C9.20335 5 6.79019 6.64004 5.66895 9.01082C3.06206 9.18144 1 11.3498 1 13.9999C1 16.7613 3.23858 19.0001 6 19.0001L19 19C21.2091 19 23 17.2091 23 15Z" stroke="#c9c9c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
                   </span>
                 <span className="text-xs text-gray-400">
                   {form.attachment ? form.attachment.name : 'Click to upload — JPG, PNG, PDF · max 5MB'}
