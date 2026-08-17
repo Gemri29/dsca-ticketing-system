@@ -38,8 +38,8 @@ const Sidebar = ({ counts = {} }) => {
   const isSuperAdmin = user?.role === 'SUPER_ADMIN'
 
   const activeItemClass = isSuperAdmin
-    ? 'bg-purple-50 text-purple-600 border-l-[3px] border-purple-600'
-    : 'bg-blue-50 text-blue-600 border-l-[3px] border-blue-600'
+    ? 'bg-purple-50 text-purple-600 border-l-[3px] border-purple-600 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-400'
+    : 'bg-blue-50 text-blue-600 border-l-[3px] border-blue-600 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-400'
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
@@ -51,7 +51,7 @@ const Sidebar = ({ counts = {} }) => {
       className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-l-[3px] transition-colors ${
         isActive(path)
           ? activeItemClass
-          : 'text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-800'
+          : 'text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200'
       }`}
     >
       <span className="w-[17px] h-[17px] flex-shrink-0">{icon}</span>
@@ -62,10 +62,10 @@ const Sidebar = ({ counts = {} }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Toggle — desktop only */}
-      <div className="hidden md:flex items-center justify-end px-3 py-2.5 border-b border-gray-100">
+      <div className="hidden md:flex items-center justify-end px-3 py-2.5 border-b border-gray-100 dark:border-gray-800">
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="text-gray-400 hover:text-gray-600 p-0.5"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-0.5"
           aria-label="Toggle sidebar"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,9 +75,9 @@ const Sidebar = ({ counts = {} }) => {
       </div>
 
       {/* Mobile header inside drawer */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-gray-100">
-        <span className="text-sm font-medium text-gray-800">Menu</span>
-        <button onClick={() => setMobileOpen(false)} className="text-gray-400 hover:text-gray-600">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+        <span className="text-sm font-medium text-gray-800 dark:text-gray-100">Menu</span>
+        <button onClick={() => setMobileOpen(false)} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -87,7 +87,7 @@ const Sidebar = ({ counts = {} }) => {
       {/* Main section */}
       <div className="py-2">
         {(!collapsed || mobileOpen) && (
-          <div className="text-[10px] font-medium text-gray-300 uppercase tracking-[0.06em] px-4 py-1.5">Main</div>
+          <div className="text-[10px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.06em] px-4 py-1.5">Main</div>
         )}
 
         <NavItem path="/admin/dashboard" label="Dashboard" icon={
@@ -96,13 +96,13 @@ const Sidebar = ({ counts = {} }) => {
           </svg>
         } />
 
-       {/* Dashboard sub-counts */}
+        {/* Dashboard sub-counts */}
         {(!collapsed || mobileOpen) && (
           <div className="pl-[43px] flex flex-col gap-0.5 mb-1">
             {[
-              { label: 'Pending', key: 'pending', color: 'bg-orange-50 text-orange-600' },
-              { label: 'Unresolved', key: 'unresolved', color: 'bg-red-50 text-red-500' },
-              { label: 'Resolved', key: 'resolved', color: 'bg-green-50 text-green-600' },
+              { label: 'Pending', key: 'pending', color: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400' },
+              { label: 'Unresolved', key: 'unresolved', color: 'bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-400' },
+              { label: 'Resolved', key: 'resolved', color: 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400' },
             ].map(({ label, key, color }) => {
               const isSubActive = location.pathname === '/admin/dashboard' &&
                 new URLSearchParams(location.search).get('status') === key
@@ -113,9 +113,9 @@ const Sidebar = ({ counts = {} }) => {
                   className={`flex items-center justify-between px-2 py-1 rounded-md cursor-pointer text-[12px] transition-colors ${
                     isSubActive
                       ? isSuperAdmin
-                        ? 'bg-purple-50 text-purple-600 font-medium'
-                        : 'text-blue-600 font-medium'
-                      : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'
+                        ? 'bg-purple-50 text-purple-600 font-medium dark:bg-purple-500/10 dark:text-purple-400'
+                        : 'text-blue-600 font-medium dark:text-blue-400'
+                      : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-blue-500/10 dark:hover:text-blue-400'
                   }`}
                 >
                   {label}
@@ -137,7 +137,7 @@ const Sidebar = ({ counts = {} }) => {
         } />
 
         {isSuperAdmin && (!collapsed || mobileOpen) && (
-          <div className="text-[10px] font-medium text-gray-300 uppercase tracking-[0.06em] px-4 py-1.5 mt-1">Super Admin</div>
+          <div className="text-[10px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.06em] px-4 py-1.5 mt-1">Super Admin</div>
         )}
 
         {isSuperAdmin && (
@@ -157,9 +157,9 @@ const Sidebar = ({ counts = {} }) => {
       </div>
 
       {/* Account section */}
-      <div className="mt-auto border-t border-gray-100 py-2">
+      <div className="mt-auto border-t border-gray-100 dark:border-gray-800 py-2">
         {(!collapsed || mobileOpen) && (
-          <div className="text-[10px] font-medium text-gray-300 uppercase tracking-[0.06em] px-4 py-1.5">Account</div>
+          <div className="text-[10px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.06em] px-4 py-1.5">Account</div>
         )}
 
         <NavItem path="/admin/settings" label="Settings" icon={
@@ -171,7 +171,7 @@ const Sidebar = ({ counts = {} }) => {
 
         <div
           onClick={() => setShowLogoutModal(true)}
-          className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-l-[3px] border-transparent text-red-400 hover:bg-red-50 transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-l-[3px] border-transparent text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
         >
           <span className="w-[17px] h-[17px] flex-shrink-0">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
@@ -184,16 +184,16 @@ const Sidebar = ({ counts = {} }) => {
 
       {/* Logout modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6 w-[320px] mx-4">
-            <div className="text-[15px] font-medium text-gray-900 mb-1">Sign out?</div>
-            <div className="text-[13px] text-gray-400 mb-5 leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50">
+          <div className="bg-white dark:bg-[#1b1b1b] rounded-xl border border-gray-200 dark:border-gray-800 shadow-lg p-6 w-[320px] mx-4">
+            <div className="text-[15px] font-medium text-gray-900 dark:text-gray-100 mb-1">Sign out?</div>
+            <div className="text-[13px] text-gray-400 dark:text-gray-500 mb-5 leading-relaxed">
               You'll be logged out of your current session. Any unsaved changes will be lost.
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 py-2 rounded-lg border border-gray-200 text-[13px] text-gray-600 hover:bg-gray-50"
+                className="flex-1 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-[13px] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
               >
                 Cancel
               </button>
@@ -214,7 +214,7 @@ const Sidebar = ({ counts = {} }) => {
     <>
       {/* ── Desktop sidebar ─────────────────────── */}
       <div
-        className="hidden md:flex flex-col bg-white border-r border-gray-200 flex-shrink-0 transition-all duration-200"
+        className="hidden md:flex flex-col bg-white dark:bg-[#1b1b1b] border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200"
         style={{ width: collapsed ? 52 : 220 }}
       >
         <SidebarContent />
@@ -223,7 +223,7 @@ const Sidebar = ({ counts = {} }) => {
       {/* ── Mobile hamburger button ──────────────── */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-[13px] left-3 z-40 p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+        className="md:hidden fixed top-[13px] left-3 z-40 p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
         aria-label="Open menu"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,13 +234,13 @@ const Sidebar = ({ counts = {} }) => {
       {/* ── Mobile backdrop ──────────────────────── */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/30 z-40"
+          className="md:hidden fixed inset-0 bg-black/30 dark:bg-black/50 z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* ── Mobile drawer ────────────────────────── */}
-      <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 flex flex-col transform transition-transform duration-200 ${
+      <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#1b1b1b] border-r border-gray-200 dark:border-gray-800 z-50 flex flex-col transform transition-transform duration-200 ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <SidebarContent />

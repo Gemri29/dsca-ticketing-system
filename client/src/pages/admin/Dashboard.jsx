@@ -5,20 +5,16 @@ import Sidebar from '../../components/Sidebar'
 import { getTickets } from '../../api/tickets'
 import { formatTimeAgo, isSLABreached } from '../../utils/formatters'
 import usePageTitle from '../../hooks/usePageTitle'
+import useDarkMode from '../../hooks/useDarkMode'
+import { priorityStyles as PRIORITY_STYLES } from '../../components/PriorityBadge'
 
 const STATUS_FILTERS = ['PENDING', 'UNRESOLVED', 'RESOLVED']
 
-const PRIORITY_STYLES = {
-  CRITICAL: 'bg-red-50 text-red-500 border border-red-200',
-  HIGH: 'bg-orange-50 text-orange-600 border border-orange-200',
-  MEDIUM: 'bg-yellow-50 text-yellow-600 border border-yellow-200',
-  LOW: 'bg-gray-50 text-gray-500 border border-gray-200',
-}
 
 const STAT_CONFIG = {
-  PENDING: { label: 'Pending', numColor: 'text-orange-500', iconBg: 'bg-orange-50 text-orange-500' },
-  UNRESOLVED: { label: 'Unresolved', numColor: 'text-red-500', iconBg: 'bg-red-50 text-red-500' },
-  RESOLVED: { label: 'Resolved', numColor: 'text-green-600', iconBg: 'bg-green-50 text-green-600' },
+  PENDING: { label: 'Pending', numColor: 'text-orange-500', iconBg: 'bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400' },
+  UNRESOLVED: { label: 'Unresolved', numColor: 'text-red-500', iconBg: 'bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-400' },
+  RESOLVED: { label: 'Resolved', numColor: 'text-green-600', iconBg: 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400' },
 }
 
 const STAT_ICONS = {
@@ -44,6 +40,7 @@ const Dashboard = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const { isDark, toggle } = useDarkMode()
 
   const initialStatus = searchParams.get('status')?.toUpperCase() || 'PENDING'
   const [activeFilter, setActiveFilter] = useState(
@@ -53,7 +50,6 @@ const Dashboard = () => {
   const [counts, setCounts] = useState({ PENDING: 0, UNRESOLVED: 0, RESOLVED: 0 })
   const [loading, setLoading] = useState(true)
 
-  // Fetch counts for all statuses
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -88,6 +84,7 @@ const Dashboard = () => {
     }
     fetchTickets()
   }, [activeFilter])
+
   useEffect(() => {
     const status = searchParams.get('status')?.toUpperCase()
     if (status && STATUS_FILTERS.includes(status)) {
@@ -112,24 +109,42 @@ const Dashboard = () => {
   const assetLabel = (t) => t.laptopNumber || t.desktopNumber || '—'
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fa] dark:bg-[#1b1b1b]">
+
       {/* Topbar */}
-      <div className="bg-white border-b border-gray-200 h-[52px] flex items-center justify-between px-5 flex-shrink-0 pl-16">
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-white dark:bg-[#1b1b1b] border-b border-gray-200 dark:border-gray-800 h-[52px] flex items-center justify-between px-5 flex-shrink-0 pl-16">
+        <div className="flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-100">
+          <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
           </svg>
           DSCA IT Support
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/admin/inbox')} className="relative text-gray-400 hover:text-gray-600">
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {isDark ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
+
+          <button onClick={() => navigate('/admin/inbox')} className="relative text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full border border-white" />
+            <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full border border-white dark:border-[#1b1b1b]" />
           </button>
-          <span className="text-[13px] text-gray-500">{user?.name}</span>
-          <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[11px] font-medium text-blue-600">
+          <span className="text-[13px] text-gray-500 dark:text-gray-400">{user?.name}</span>
+          <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[11px] font-medium text-blue-600 dark:text-blue-400">
             {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
           </div>
         </div>
@@ -140,9 +155,9 @@ const Dashboard = () => {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header + stat cards */}
-          <div className="px-6 pt-5 pb-0 bg-[#f7f8fa]">
-            <div className="text-[17px] font-medium text-gray-900 mb-0.5">Dashboard</div>
-            <div className="text-[13px] text-gray-400 mb-4">{today} · Welcome back, {firstName}</div>
+          <div className="px-6 pt-5 pb-0 bg-[#f7f8fa] dark:bg-[#1b1b1b]">
+            <div className="text-[17px] font-medium text-gray-900 dark:text-gray-100 mb-0.5">Dashboard</div>
+            <div className="text-[13px] text-gray-400 dark:text-gray-500 mb-4">{today} · Welcome back, {firstName}</div>
 
             {/* Stat cards */}
             <div className="grid grid-cols-3 gap-3 mb-5">
@@ -153,12 +168,14 @@ const Dashboard = () => {
                   <div
                     key={status}
                     onClick={() => setFilter(status)}
-                    className={`bg-white border rounded-[10px] px-4 py-3.5 cursor-pointer transition-all ${
-                      isActive ? 'border-blue-500 bg-blue-50/30' : 'border-gray-200 hover:border-gray-300'
+                    className={`border rounded-[10px] px-4 py-3.5 cursor-pointer transition-all ${
+                      isActive
+                        ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-500/10 dark:border-blue-500/30'
+                        : 'bg-white dark:bg-white/5 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.04em]">{cfg.label}</span>
+                      <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.04em]">{cfg.label}</span>
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${cfg.iconBg}`}>
                         {STAT_ICONS[status]}
                       </div>
@@ -177,8 +194,8 @@ const Dashboard = () => {
                   onClick={() => setFilter(status)}
                   className={`px-[18px] py-[7px] rounded-t-lg text-[13px] font-medium border border-b-0 transition-colors ${
                     activeFilter === status
-                      ? 'bg-white text-blue-600 border-blue-100'
-                      : 'bg-gray-100 text-gray-400 border-gray-200 hover:text-gray-600'
+                      ? 'bg-white dark:bg-white/5 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/30'
+                      : 'bg-gray-100 dark:bg-[#1b1b1b] text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
                   }`}
                 >
                   {status.charAt(0) + status.slice(1).toLowerCase()}
@@ -188,18 +205,19 @@ const Dashboard = () => {
           </div>
 
           {/* Ticket list */}
-          <div className="flex-1 bg-white border-t border-gray-200 overflow-auto">
-            {/* List header */}
-            <div className="grid gap-0 px-5 py-2.5 border-b border-gray-100 bg-gray-50" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}>
+          <div className="flex-1 bg-white dark:bg-[#1b1b1b] border-t border-gray-200 dark:border-gray-800 overflow-auto">
+
+            {/* Desktop list header */}
+            <div className="hidden md:grid gap-0 px-5 py-2.5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03]" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}>
               {['Submitter', 'Asset', 'Issue', 'Priority', 'Time'].map(h => (
-                <div key={h} className="text-[11px] font-medium text-gray-300 uppercase tracking-[0.04em] min-w-0">{h}</div>
+                <div key={h} className="text-[11px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.04em] min-w-0">{h}</div>
               ))}
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16 text-[13px] text-gray-300">Loading...</div>
+              <div className="flex items-center justify-center py-16 text-[13px] text-gray-300 dark:text-gray-600">Loading...</div>
             ) : tickets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+              <div className="flex flex-col items-center justify-center py-16 text-gray-300 dark:text-gray-600">
                 <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
@@ -212,28 +230,55 @@ const Dashboard = () => {
                   <div
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
-                    className="grid gap-0 px-6 py-4 border-b border-gray-50 cursor-pointer hover:bg-blue-50/30 items-center transition-colors"
-                    style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}
+                    className="border-b py-2 border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors"
                   >
-                    <div className="text-[13px] text-gray-800 font-medium truncate pr-2 min-w-0">{ticket.fullName}</div>
-                    <div className="text-[12px] text-gray-500 font-mono truncate pr-2 min-w-0">{assetLabel(ticket)}</div>
-                    <div className="pr-2 min-w-0 overflow-hidden">
-                      <div className="text-[12px] text-gray-500 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
-                      {sla && (
-                        <div className="flex items-center gap-1 mt-0.5 text-[11px] text-red-500">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          SLA breach
+                    {/* Desktop row */}
+                    <div className="hidden md:grid gap-0 px-5 py-3 items-center" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}>
+                      <div className="text-[13px] text-gray-800 dark:text-gray-200 font-medium truncate pr-2 min-w-0">{ticket.fullName}</div>
+                      <div className="text-[12px] text-gray-500 dark:text-gray-400 font-mono truncate pr-2 min-w-0">{assetLabel(ticket)}</div>
+                      <div className="pr-2 min-w-0 overflow-hidden">
+                        <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
+                        {sla && (
+                          <div className="flex items-center gap-1 mt-0.5 text-[11px] text-red-500 dark:text-red-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            SLA breach
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
+                          {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-gray-300 dark:text-gray-600">{formatTimeAgo(ticket.createdAt)}</div>
+                    </div>
+
+                    {/* Mobile card */}
+                    <div className="md:hidden px-10 py-5 flex flex-col gap-1.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-[13px] text-gray-800 dark:text-gray-200 font-medium truncate">{ticket.fullName}</div>
+                          <div className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">{assetLabel(ticket)}</div>
                         </div>
-                      )}
+                        <div className="flex-shrink-0 text-[11px] text-gray-300 dark:text-gray-600">{formatTimeAgo(ticket.createdAt)}</div>
+                      </div>
+                      <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
+                          {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
+                        </span>
+                        {sla && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-full px-2 py-0.5">
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            SLA
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
-                        {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-gray-300">{formatTimeAgo(ticket.createdAt)}</div>
                   </div>
                 )
               })

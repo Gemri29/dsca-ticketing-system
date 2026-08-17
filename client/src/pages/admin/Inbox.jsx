@@ -4,31 +4,32 @@ import { useAuth } from '../../context/AuthContext'
 import Sidebar from '../../components/Sidebar'
 import { getTickets } from '../../api/tickets'
 import { formatTimeAgo, isSLABreached } from '../../utils/formatters'
+import useDarkMode from '../../hooks/useDarkMode'
 import toast from 'react-hot-toast'
-import usePageTitle from '../../hooks/usePageTitle'
 
 const STATUS_STYLES = {
-  PENDING: 'bg-orange-50 text-orange-600 border border-orange-200',
-  UNRESOLVED: 'bg-red-50 text-red-500 border border-red-200',
-  RESOLVED: 'bg-green-50 text-green-600 border border-green-200',
+  PENDING: 'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30',
+  UNRESOLVED: 'bg-red-50 text-red-500 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30',
+  RESOLVED: 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/30',
 }
 
 const PRIORITY_STYLES = {
-  CRITICAL: 'bg-red-50 text-red-500 border border-red-200',
-  HIGH: 'bg-orange-50 text-orange-600 border border-orange-200',
-  MEDIUM: 'bg-yellow-50 text-yellow-600 border border-yellow-200',
-  LOW: 'bg-gray-50 text-gray-500 border border-gray-200',
+  CRITICAL: 'bg-red-50 text-red-500 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30',
+  HIGH: 'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30',
+  MEDIUM: 'bg-yellow-50 text-yellow-600 border border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/30',
+  LOW: 'bg-gray-50 text-gray-500 border border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-gray-700',
 }
 
+const SITES = ['Moe', 'Dubai Mall', 'ADCB', 'JBR']
 const STATUSES = ['PENDING', 'UNRESOLVED', 'RESOLVED']
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
 
 const PAGE_SIZE = 25
 
 const Inbox = () => {
-  usePageTitle('Inbox')
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isDark, toggle } = useDarkMode()
 
   const [tickets, setTickets] = useState([])
   const [total, setTotal] = useState(0)
@@ -36,15 +37,15 @@ const Inbox = () => {
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState({ status: [], priority: [] })
+  const [filters, setFilters] = useState({ status: [], priority: [], site: [] })
   const [sortOrder, setSortOrder] = useState('desc')
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [openGroups, setOpenGroups] = useState({ status: false, priority: false})
+  const [openGroups, setOpenGroups] = useState({ status: false, priority: false, site: false })
   const [selected, setSelected] = useState(new Set())
 
   const dropdownRef = useRef(null)
 
-  const activeFilterCount = filters.status.length + filters.priority.length
+  const activeFilterCount = filters.status.length + filters.priority.length + filters.site.length
 
   useEffect(() => {
     const handler = (e) => {
@@ -78,6 +79,7 @@ const Inbox = () => {
       // Client-side multi-value filter (API only supports single value)
       if (filters.status.length > 1) data = data.filter(t => filters.status.includes(t.status))
       if (filters.priority.length > 1) data = data.filter(t => filters.priority.includes(t.priority))
+      if (filters.site.length) data = data.filter(t => filters.site.includes(t.siteName))
       if (search.trim()) {
         const q = search.toLowerCase()
         data = data.filter(t =>
@@ -125,7 +127,7 @@ const Inbox = () => {
   const removeChip = (group, value) => toggleFilter(group, value)
 
   const clearAll = () => {
-    setFilters({ status: [], priority: []})
+    setFilters({ status: [], priority: [], site: [] })
     setPage(1)
   }
 
@@ -148,21 +150,39 @@ const Inbox = () => {
   const chipLabel = (group, value) => {
     if (group === 'status') return `Status: ${value.charAt(0) + value.slice(1).toLowerCase()}`
     if (group === 'priority') return `Priority: ${value.charAt(0) + value.slice(1).toLowerCase()}`
+    return `Site: ${value}`
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fa] dark:bg-[#1b1b1b]">
       {/* Topbar */}
-      <div className="bg-white border-b border-gray-200 h-[52px] flex items-center justify-between px-5 flex-shrink-0 pl-16">
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-white dark:bg-[#1b1b1b] border-b border-gray-200 dark:border-gray-800 h-[52px] flex items-center justify-between px-5 flex-shrink-0 pl-16">
+        <div className="flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-100">
+          <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
           </svg>
           DSCA IT Support
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-gray-500">{user?.name}</span>
-          <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[11px] font-medium text-blue-600">
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {isDark ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
+
+          <span className="text-[13px] text-gray-500 dark:text-gray-400">{user?.name}</span>
+          <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[11px] font-medium text-blue-600 dark:text-blue-400">
             {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
           </div>
         </div>
@@ -173,17 +193,17 @@ const Inbox = () => {
 
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Inbox header */}
-          <div className="px-6 pt-5 pb-3.5 bg-[#f7f8fa] border-b border-gray-200">
+          <div className="px-6 pt-5 pb-3.5 bg-[#f7f8fa] dark:bg-[#1b1b1b] border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-baseline gap-2.5 mb-3.5">
-              <div className="text-[17px] font-medium text-gray-900">Inbox</div>
-              <div className="text-[13px] text-gray-400">{total} tickets</div>
+              <div className="text-[17px] font-medium text-gray-900 dark:text-gray-100">Inbox</div>
+              <div className="text-[13px] text-gray-400 dark:text-gray-500">{total} tickets</div>
             </div>
 
             {/* Toolbar */}
             <div className="flex items-center gap-2">
               {/* Search */}
               <div className="flex-1 relative">
-                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 dark:text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -191,7 +211,7 @@ const Inbox = () => {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search by name, asset, or issue..."
-                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 bg-white text-[13px] text-gray-800 focus:outline-none focus:border-blue-500"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-[13px] text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -201,8 +221,8 @@ const Inbox = () => {
                   onClick={() => setDropdownOpen(o => !o)}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[13px] font-medium transition-colors ${
                     activeFilterCount > 0
-                      ? 'border-blue-500 text-blue-600 bg-blue-50'
-                      : 'border-gray-200 text-gray-500 bg-white hover:bg-gray-50'
+                      ? 'border-blue-500 text-blue-600 bg-blue-50 dark:border-blue-500 dark:text-blue-400 dark:bg-blue-500/10'
+                      : 'border-gray-200 text-gray-500 bg-white hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:bg-white/5 dark:hover:bg-white/10'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,28 +240,29 @@ const Inbox = () => {
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute top-[calc(100%+6px)] left-0 z-50 w-[220px] bg-white border border-gray-200 rounded-[10px] overflow-hidden shadow-lg">
+                  <div className="absolute top-[calc(100%+6px)] left-0 z-50 w-[220px] bg-white dark:bg-[#232323] border border-gray-200 dark:border-gray-700 rounded-[10px] overflow-hidden shadow-lg">
                     {[
                       { key: 'status', label: 'Status', options: STATUSES, display: v => v.charAt(0) + v.slice(1).toLowerCase() },
                       { key: 'priority', label: 'Priority', options: PRIORITIES, display: v => v.charAt(0) + v.slice(1).toLowerCase() },
+                      { key: 'site', label: 'Site', options: SITES, display: v => v },
                     ].map(group => (
-                      <div key={group.key} className="border-b border-gray-100 last:border-0">
+                      <div key={group.key} className="border-b border-gray-100 dark:border-gray-700 last:border-0">
                         <button
                           onClick={() => toggleGroup(group.key)}
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[13px] font-medium text-gray-800 hover:bg-gray-50"
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[13px] font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5"
                         >
                           {group.label}
                           <svg
-                            className={`w-3.5 h-3.5 text-gray-400 transition-transform ${openGroups[group.key] ? 'rotate-180' : ''}`}
+                            className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform ${openGroups[group.key] ? 'rotate-180' : ''}`}
                             fill="none" stroke="currentColor" viewBox="0 0 24 24"
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </button>
                         {openGroups[group.key] && (
-                          <div className="bg-blue-50/30">
+                          <div className="bg-blue-50/30 dark:bg-blue-500/5">
                             {group.options.map(opt => (
-                              <label key={opt} className="flex items-center gap-2.5 px-4 py-2 cursor-pointer text-[13px] text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                              <label key={opt} className="flex items-center gap-2.5 px-4 py-2 cursor-pointer text-[13px] text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400">
                                 <input
                                   type="checkbox"
                                   checked={filters[group.key].includes(opt)}
@@ -256,7 +277,7 @@ const Inbox = () => {
                       </div>
                     ))}
                     <div className="px-3.5 py-2 flex justify-end">
-                      <button onClick={clearAll} className="text-[12px] text-gray-400 hover:text-red-500 bg-none border-none cursor-pointer">
+                      <button onClick={clearAll} className="text-[12px] text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 bg-none border-none cursor-pointer">
                         Clear all filters
                       </button>
                     </div>
@@ -267,7 +288,7 @@ const Inbox = () => {
               {/* Sort */}
               <button
                 onClick={() => { setSortOrder(o => o === 'desc' ? 'asc' : 'desc'); setPage(1) }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-[13px] text-gray-500 hover:bg-gray-50"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-[13px] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/10"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -279,11 +300,11 @@ const Inbox = () => {
             {/* Active filter chips */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {['status', 'priority'].flatMap(group =>
+                {['status', 'priority', 'site'].flatMap(group =>
                   filters[group].map(value => (
-                    <div key={`${group}-${value}`} className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-full px-2.5 py-0.5 text-[11px] font-medium">
+                    <div key={`${group}-${value}`} className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-400 rounded-full px-2.5 py-0.5 text-[11px] font-medium">
                       {chipLabel(group, value)}
-                      <button onClick={() => removeChip(group, value)} className="text-blue-300 hover:text-blue-600">
+                      <button onClick={() => removeChip(group, value)} className="text-blue-300 dark:text-blue-500 hover:text-blue-600 dark:hover:text-blue-300">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -308,19 +329,19 @@ const Inbox = () => {
           )}
 
           {/* Ticket list */}
-          <div className="flex-1 bg-white overflow-auto">
+          <div className="flex-1 bg-white dark:bg-[#1b1b1b] overflow-auto">
             {/* List header */}
-            <div className="grid px-5 py-2.5 border-b border-gray-100 bg-gray-50 items-center" style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}>
+            <div className="grid px-5 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03] items-center" style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}>
               <div />
               {['Submitter', 'Asset', 'Issue', 'Site', 'Status', 'Priority'].map(h => (
-                <div key={h} className="text-[12px] font-medium text-gray-300 uppercase tracking-[0.04em]">{h}</div>
+                <div key={h} className="text-[12px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.04em]">{h}</div>
               ))}
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16 text-[13px] text-gray-300">Loading...</div>
+              <div className="flex items-center justify-center py-16 text-[13px] text-gray-300 dark:text-gray-600">Loading...</div>
             ) : displayedTickets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+              <div className="flex flex-col items-center justify-center py-16 text-gray-300 dark:text-gray-600">
                 <svg className="w-7 h-7 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -333,22 +354,21 @@ const Inbox = () => {
                   <div
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
-                    className="grid px-5 py-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50/20 items-center transition-colors"
-                    style={{ gridTemplateColumns: '24px minmax(0,2fr) minmax(0,1.3fr) minmax(0,2.2fr) 1fr 1fr 1fr' }}
-                    >
+                    className="grid px-5 py-3 border-b border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-blue-50/20 dark:hover:bg-blue-500/5 items-center transition-colors"
+                    style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}
+                  >
                     <div onClick={e => { e.stopPropagation(); toggleSelect(ticket.id) }}>
-                      <div className={`w-3.5 h-3.5 rounded border-[1.5px] flex-shrink-0 ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-white'}`} />
+                      <div className={`w-3.5 h-3.5 rounded border-[1.5px] flex-shrink-0 ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-transparent'}`} />
                     </div>
-                    <div className="py-3 border-b border-gray-50 cursor-pointer hover:bg-blue-50/30 items-center transition-colors"
-                    >
-                      <div className="text-[13px] text-gray-800 font-medium truncate min-w-0">{ticket.fullName}</div>
-                      <div className="text-[11px] text-gray-300 font-mono">{ticket.ticketCode}</div>
+                    <div className="min-w-0">
+                      <div className="text-[13px] text-gray-800 dark:text-gray-100 font-medium truncate pr-2">{ticket.fullName}</div>
+                      <div className="text-[11px] text-gray-300 dark:text-gray-600 font-mono">{ticket.ticketCode}</div>
                     </div>
-                    <div className="text-[12px] text-gray-500 font-mono truncate pr-2">{assetLabel(ticket)}</div>
-                    <div className="pr-2">
-                      <div className="text-[12px] text-gray-500 truncate">{ticket.issueType}</div>
+                    <div className="text-[12px] text-gray-500 dark:text-gray-400 font-mono truncate pr-2">{assetLabel(ticket)}</div>
+                    <div className="min-w-0">
+                      <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate-pr-2">{ticket.issueType}</div>
                       {sla && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 bg-red-50 border border-red-200 rounded-full px-1.5 py-0.5 mt-0.5">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-full px-1.5 py-0.5 mt-0.5">
                           <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
@@ -356,8 +376,8 @@ const Inbox = () => {
                         </span>
                       )}
                     </div>
-                    <div className="text-[12px] text-gray-500 truncate">{ticket.siteName || '—'}</div>
-                    <div>
+                    <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.siteName || '—'}</div>
+                    <div className="pr-1.5 pl-1.5">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_STYLES[ticket.status]}`}>
                         {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase()}
                       </span>
@@ -374,13 +394,13 @@ const Inbox = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50 text-[12px] text-gray-400">
+          <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03] text-[12px] text-gray-400 dark:text-gray-500">
             <span>Showing {Math.min((page - 1) * PAGE_SIZE + 1, total)}–{Math.min(page * PAGE_SIZE, total)} of {total}</span>
             <div className="flex gap-1">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-2.5 py-1 rounded-md border border-gray-200 bg-white text-gray-500 disabled:opacity-40 hover:bg-gray-50"
+                className="px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-white/10"
               >
                 Previous
               </button>
@@ -388,7 +408,7 @@ const Inbox = () => {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-2.5 py-1 rounded-md border text-[12px] ${page === p ? 'bg-blue-50 text-blue-600 border-blue-200' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'}`}
+                  className={`px-2.5 py-1 rounded-md border text-[12px] ${page === p ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'}`}
                 >
                   {p}
                 </button>
@@ -396,7 +416,7 @@ const Inbox = () => {
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-2.5 py-1 rounded-md border border-gray-200 bg-white text-gray-500 disabled:opacity-40 hover:bg-gray-50"
+                className="px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-white/10"
               >
                 Next
               </button>
