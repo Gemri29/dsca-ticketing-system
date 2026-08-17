@@ -228,7 +228,8 @@ const LandingPage = () => {
                   <button type="button" onClick={() => { setSelectedLaptop(null); setLaptopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
                 </div>
               ) : (
-              <div className={form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}>                  <input
+              <div className={`relative${form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}`}>                  
+              <input
                     type="text"
                     value={laptopQuery}
                     onChange={e => { setLaptopQuery(e.target.value); setLaptopDropdownOpen(true) }}
@@ -267,8 +268,8 @@ const LandingPage = () => {
                   <button type="button" onClick={() => { setSelectedDesktop(null); setDesktopQuery('') }} className="text-blue-300 hover:text-blue-600 text-xs">✕</button>
                 </div>
               ) : (
-                <div className={selectedLaptop || form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}>
-                  <input
+                <div className={`relative${form.issueType === 'Sim Card Request' ? 'opacity-40 pointer-events-none select-none' : ''}`}>                  
+                <input
                     type="text"
                     value={desktopQuery}
                     onChange={e => { setDesktopQuery(e.target.value); setDesktopDropdownOpen(true) }}
