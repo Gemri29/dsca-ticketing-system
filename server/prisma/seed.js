@@ -13,16 +13,18 @@ async function main() {
   })
 
   if (!existing) {
-    const hashedPassword = await bcrypt.hash('heisenberg', 12)
-    await prisma.user.create({
-      data: {
-        name: 'Super Admin',
-        email: 'super_admin@dscacontracting.com',
-        password: hashedPassword,
-        role: 'SUPER_ADMIN',
-        active: true
-      }
-    })
+    const seedEmail = process.env.SEED_ADMIN_EMAIL || 'super_admin@dscacontracting.com'
+    const seedPassword = process.env.SEED_ADMIN_PASSWORD || 'heisenberg'
+    const hashedPassword = await bcrypt.hash(seedPassword, 12)
+  await prisma.user.create({
+  data: {
+    name: 'Super Admin',
+    email: seedEmail,
+    password: hashedPassword,
+    role: 'SUPER_ADMIN',
+    active: true
+  }
+})
     console.log('✅ Super Admin created')
   } else {
     console.log('⏭️  Super Admin already exists — skipping')
