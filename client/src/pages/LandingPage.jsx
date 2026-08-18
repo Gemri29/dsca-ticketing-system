@@ -184,9 +184,9 @@ const LandingPage = () => {
       </div>
 
       {/* Main */}
-      <div className="flex-1 max-w-none w-full px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Form card */}
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-7">
+      <div className="w-full max-w-5xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Form card */}
+        <div className="w-full bg-gray-50 border border-gray-200 rounded-xl p-7 max-w-[600px] mx-auto">
           <h2 className="text-base font-medium text-gray-900 mb-1">New support request</h2>
           <p className="text-xs text-gray-400 mb-5">All fields are required unless marked optional.</p>
 
@@ -394,7 +394,7 @@ const LandingPage = () => {
         </div>
 
         {/* Right panel */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-full max-w-[500px] mx-auto">
           {/* Track ticket */}
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h2 className="text-sm font-medium text-gray-900 mb-1">Track my ticket</h2>

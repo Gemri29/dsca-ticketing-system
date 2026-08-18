@@ -128,9 +128,9 @@ const TicketDetail = () => {
         <div className="bg-white dark:bg-[#1b1b1b] border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center gap-3 flex-shrink-0">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 pl-6"
           >
-            ← Back
+             Back
           </button>
           <span className="text-gray-200 dark:text-gray-700">/</span>
           <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{ticket.ticketCode}</span>

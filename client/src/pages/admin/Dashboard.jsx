@@ -160,33 +160,38 @@ const Dashboard = () => {
             <div className="text-[17px] font-medium text-gray-900 dark:text-gray-100 mb-0.5">Dashboard</div>
             <div className="text-[13px] text-gray-400 dark:text-gray-500 mb-4">{today} · Welcome back, {firstName}</div>
 
-            {/* Stat cards */}
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-3 mb-5">
               {STATUS_FILTERS.map(status => {
                 const cfg = STAT_CONFIG[status]
                 const isActive = activeFilter === status
+
                 return (
                   <div
                     key={status}
                     onClick={() => setFilter(status)}
-                    className={`border rounded-[10px] px-4 py-3.5 cursor-pointer transition-all ${
+                    className={`border rounded-[10px] px-2.5 sm:px-4 py-3.5 cursor-pointer transition-all min-w-0 ${
                       isActive
                         ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-500/10 dark:border-blue-500/30'
                         : 'bg-white dark:bg-white/5 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.04em]">{cfg.label}</span>
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${cfg.iconBg}`}>
+                    <div className="flex items-center justify-between gap-1.5 mb-1.5 min-w-0">
+                      <span className="min-w-0 truncate text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.04em]">
+                        {cfg.label}
+                      </span>
+
+                      <div className={`shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center ${cfg.iconBg}`}>
                         {STAT_ICONS[status]}
                       </div>
                     </div>
-                    <div className={`text-[22px] font-medium ${cfg.numColor}`}>{counts[status]}</div>
+
+                    <div className={`text-[22px] font-medium ${cfg.numColor}`}>
+                      {counts[status]}
+                    </div>
                   </div>
                 )
               })}
             </div>
-
             {/* Filter tabs */}
             <div className="flex gap-1.5">
               {STATUS_FILTERS.map(status => (
@@ -271,6 +276,7 @@ const Dashboard = () => {
 
                     {/* Mobile card — Gmail-style */}
                     <div className="md:hidden flex items-start gap-3 px-4 py-3">
+                      
                       {/* Avatar */}
                       <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[12px] font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
                         {initials(ticket.fullName)}
