@@ -176,7 +176,7 @@ const TicketDetail = () => {
 
               {/* Submitter details */}
               <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
-                <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">Submitter details</h3>
+                <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4 ">Submitter details</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { label: 'Full name', value: ticket.fullName },
@@ -187,8 +187,8 @@ const TicketDetail = () => {
                     { label: 'Last updated', value: formatDateTime(ticket.updatedAt) }
                   ].map(({ label, value, mono }) => (
                     <div key={label}>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{label}</p>
-                      <p className={`text-sm text-gray-900 dark:text-gray-100 ${mono ? 'font-mono' : ''}`}>{value}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5 truncate">{label}</p>
+                      <p className={`text-sm text-gray-900 dark:text-gray-100 truncate ${mono ? 'font-mono' : ''}`}>{value}</p>
                     </div>
                   ))}
                 </div>
