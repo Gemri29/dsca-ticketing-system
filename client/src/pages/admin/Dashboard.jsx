@@ -10,7 +10,6 @@ import { priorityStyles as PRIORITY_STYLES } from '../../components/PriorityBadg
 
 const STATUS_FILTERS = ['PENDING', 'UNRESOLVED', 'RESOLVED']
 
-
 const STAT_CONFIG = {
   PENDING: { label: 'Pending', numColor: 'text-orange-500', iconBg: 'bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400' },
   UNRESOLVED: { label: 'Unresolved', numColor: 'text-red-500', iconBg: 'bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-400' },
@@ -107,6 +106,8 @@ const Dashboard = () => {
   }
 
   const assetLabel = (t) => t.laptopNumber || t.desktopNumber || '—'
+
+  const initials = (name) => name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?'
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f7f8fa] dark:bg-[#1b1b1b]">
@@ -226,18 +227,28 @@ const Dashboard = () => {
             ) : (
               tickets.map(ticket => {
                 const sla = isSLABreached(ticket.createdAt, ticket.status)
+                const unread = !ticket.isReadByMe
                 return (
                   <div
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
-                    className="border-b py-2 border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors"
+                    className="border-b border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors"
                   >
                     {/* Desktop row */}
-                    <div className="hidden md:grid gap-0 px-5 py-3 items-center" style={{ gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr', minWidth: 0 }}>
-                      <div className="text-[13px] text-gray-800 dark:text-gray-200 font-medium truncate pr-2 min-w-0">{ticket.fullName}</div>
+                    <div
+                      className={`hidden md:grid gap-0 px-5 py-3 items-center transition-all duration-150 ${
+                        unread
+                          ? 'bg-white hover:bg-[#FAFBFC] dark:bg-[#0f0f0f] dark:hover:bg-[#1B1B1B]'
+                          : 'bg-[#f2f6fc] hover:bg-[#edf2f8] dark:bg-[#262525] dark:hover:bg-[#2d2d2d]'
+                      } hover:relative hover:z-10 hover:shadow-[0_1px_3px_rgba(60,64,67,0.20),0_2px_8px_rgba(60,64,67,0.08)] dark:hover:shadow-[0_1px_3px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35)] `}
+                      style={{
+                        gridTemplateColumns: '2fr 1.4fr 2.5fr 1fr 1fr',
+                        minWidth: 0,
+                      }}>
+                      <div className={`text-[13px] truncate pr-2 min-w-0 ${unread ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-normal text-gray-500 dark:text-gray-400'}`}>{ticket.fullName}</div>
                       <div className="text-[12px] text-gray-500 dark:text-gray-400 font-mono truncate pr-2 min-w-0">{assetLabel(ticket)}</div>
                       <div className="pr-2 min-w-0 overflow-hidden">
-                        <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
+                        <div className={`text-[12px] truncate ${unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'font-normal text-gray-500 dark:text-gray-400'}`}>{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
                         {sla && (
                           <div className="flex items-center gap-1 mt-0.5 text-[11px] text-red-500 dark:text-red-400">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,30 +263,53 @@ const Dashboard = () => {
                           {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
                         </span>
                       </div>
-                      <div className="text-[11px] text-gray-300 dark:text-gray-600">{formatTimeAgo(ticket.createdAt)}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-gray-300 dark:text-gray-600">
+                        {formatTimeAgo(ticket.createdAt)}
+                        {unread && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />}
+                      </div>
                     </div>
 
-                    {/* Mobile card */}
-                    <div className="md:hidden px-10 py-5 flex flex-col gap-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="text-[13px] text-gray-800 dark:text-gray-200 font-medium truncate">{ticket.fullName}</div>
-                          <div className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">{assetLabel(ticket)}</div>
-                        </div>
-                        <div className="flex-shrink-0 text-[11px] text-gray-300 dark:text-gray-600">{formatTimeAgo(ticket.createdAt)}</div>
+                    {/* Mobile card — Gmail-style */}
+                    <div className="md:hidden flex items-start gap-3 px-4 py-3">
+                      {/* Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[12px] font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
+                        {initials(ticket.fullName)}
                       </div>
-                      <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.issueType}{ticket.customIssue ? ` — ${ticket.customIssue}` : ''}</div>
-                      <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
-                          {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
-                        </span>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Name + time row */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-[13px] truncate ${unread ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-normal text-gray-600 dark:text-gray-400'}`}>
+                            {ticket.fullName}
+                          </span>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className="text-[11px] text-gray-300 dark:text-gray-600">{formatTimeAgo(ticket.createdAt)}</span>
+                            {unread && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                          </div>
+                        </div>
+
+                        {/* Subject (issue type) */}
+                        <div className={`text-[12px] truncate mt-0.5 ${unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'font-normal text-gray-500 dark:text-gray-400'}`}>
+                          {ticket.issueType}
+                        </div>
+
+                        {/* Snippet + priority badge (star spot) */}
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <span className="text-[12px] text-gray-400 dark:text-gray-500 truncate">
+                            {ticket.customIssue || `${assetLabel(ticket)} · ${ticket.siteName || '—'}`}
+                          </span>
+                          <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
+                            {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
+                          </span>
+                        </div>
+
                         {sla && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-full px-2 py-0.5">
-                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center gap-1 mt-1 text-[11px] text-red-500 dark:text-red-400">
+                            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            SLA
-                          </span>
+                            SLA breach
+                          </div>
                         )}
                       </div>
                     </div>

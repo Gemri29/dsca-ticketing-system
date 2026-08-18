@@ -159,7 +159,7 @@ const Settings = () => {
           </button>
         </div>
 
-        <div className="p-6 max-w-4xl mx-auto space-y-5">
+        <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-5">
 
           {/* Profile card */}
           <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
@@ -167,16 +167,16 @@ const Settings = () => {
               <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-500/10 border-2 border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-lg font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
                 {initials}
               </div>
-              <div>
-                <p className="text-base font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-                <p className="text-sm text-gray-400 dark:text-gray-500">{user?.email}</p>
+              <div className="min-w-0">
+                <p className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 truncate">{user?.email}</p>
                 <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30">
                   {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin (IT)'}
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
               <div>
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Full name</label>
                 <input
@@ -231,7 +231,7 @@ const Settings = () => {
           </div>
 
           {/* Bottom grid */}
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
             {/* Change password */}
             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-6">

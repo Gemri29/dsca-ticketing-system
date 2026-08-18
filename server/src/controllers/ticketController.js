@@ -197,15 +197,24 @@ export const getTickets = async (req, res) => {
         include: {
           assignedUser: {
             select: { id: true, name: true }
+          },
+          reads: {
+            where: { adminId: req.user.id },
+            select: { id: true }
           }
         }
       }),
       prisma.ticket.count({ where })
     ])
-
+  
+    const ticketsWithReadState = tickets.map(({ reads, ...t }) => ({
+      ...t,
+      isReadByMe: reads.length > 0
+    }))
+  
     return res.status(200).json({
       success: true,
-      tickets,
+      tickets: ticketsWithReadState,
       pagination: {
         total,
         page: pageNum,
@@ -238,6 +247,13 @@ export const getTicketById = async (req, res) => {
     if (!ticket) {
       return res.status(404).json({ success: false, message: 'Ticket not found.' })
     }
+
+    // Mark as read by this admin — upsert so re-opening an already-read ticket is a no-op
+    await prisma.ticketRead.upsert({
+      where: { ticketId_adminId: { ticketId: id, adminId: req.user.id } },
+      create: { ticketId: id, adminId: req.user.id },
+      update: {}
+    })
 
     return res.status(200).json({ success: true, ticket })
   } catch (err) {

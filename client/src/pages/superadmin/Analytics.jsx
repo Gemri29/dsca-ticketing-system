@@ -3,6 +3,7 @@ import { getAnalytics } from '../../api/admin'
 import Sidebar from '../../components/Sidebar'
 import toast from 'react-hot-toast'
 import usePageTitle from '../../hooks/usePageTitle'
+import useDarkMode from '../../hooks/useDarkMode'
 
 const StatCard = ({ label, value, sub, subUp, icon }) => (
   <div className="bg-white border border-gray-200 rounded-xl p-5">

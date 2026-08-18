@@ -23,7 +23,8 @@ model Ticket {
   internalNote String?
   assignedTo   String?
   assignedUser User?    @relation(fields: [assignedTo], references: [id])
-  slaEmailSent Boolean  @default(false)    
+  slaEmailSent Boolean  @default(false)
+  reads        TicketRead[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -36,8 +37,21 @@ model User {
   role            Role     @default(ADMIN)
   active          Boolean  @default(true)
   assignedTickets Ticket[]
+  ticketReads     TicketRead[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model TicketRead {
+  id       String   @id @default(cuid())
+  ticketId String
+  ticket   Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  adminId  String
+  admin    User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  readAt   DateTime @default(now())
+
+  @@unique([ticketId, adminId])
+  @@index([adminId])
 }
 
 model Laptop {

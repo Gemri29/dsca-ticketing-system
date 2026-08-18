@@ -408,22 +408,33 @@ cors({
 ## 6. Database Schema (Prisma)
 
 ```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
 model Ticket {
   id           String   @id @default(cuid())
-  ticketCode   String   @unique       // TKT-XXXX
+  ticketCode   String   @unique
   fullName     String
   email        String
-  laptopNumber String                 // format: DSCA-LAPTOP-XXX
-  siteLocation String
+  laptopNumber  String?
+  desktopNumber String?
+  siteName      String
   issueType    String
   customIssue  String?
   priority     Priority @default(MEDIUM)
-  attachment   String?                // Cloudinary URL
+  attachment   String?
   status       Status   @default(PENDING)
-  remark       String?                // optional, shown to submitter on resolve
-  internalNote String?                // admin-only, never exposed publicly
+  remark       String?
+  internalNote String?
   assignedTo   String?
   assignedUser User?    @relation(fields: [assignedTo], references: [id])
+  slaEmailSent Boolean  @default(false)
+  reads        TicketRead[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -432,20 +443,39 @@ model User {
   id              String   @id @default(cuid())
   email           String   @unique
   name            String
-  password        String                   // bcrypt hash
+  password        String
   role            Role     @default(ADMIN)
   active          Boolean  @default(true)
   assignedTickets Ticket[]
+  ticketReads     TicketRead[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
-// Registered laptop assets — powers the combobox on the ticket form
+model TicketRead {
+  id       String   @id @default(cuid())
+  ticketId String
+  ticket   Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  adminId  String
+  admin    User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  readAt   DateTime @default(now())
+
+  @@unique([ticketId, adminId])
+  @@index([adminId])
+}
+
 model Laptop {
   id           String   @id @default(cuid())
-  assetCode    String   @unique  // e.g. DSCA-LAPTOP-001
-  assignedTo   String?           // employee name or ID (optional reference)
-  siteLocation String?
+  assetCode    String   @unique
+  assignedTo   String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Desktop {
+  id           String   @id @default(cuid())
+  assetCode    String   @unique
+  assignedTo   String?
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
 }
@@ -467,6 +497,7 @@ enum Priority {
   HIGH
   CRITICAL
 }
+
 ```
 
 ---

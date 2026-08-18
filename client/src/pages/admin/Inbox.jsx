@@ -147,6 +147,8 @@ const Inbox = () => {
 
   const assetLabel = (t) => t.laptopNumber || t.desktopNumber || '—'
 
+  const initials = (name) => name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?'
+
   const chipLabel = (group, value) => {
     if (group === 'status') return `Status: ${value.charAt(0) + value.slice(1).toLowerCase()}`
     if (group === 'priority') return `Priority: ${value.charAt(0) + value.slice(1).toLowerCase()}`
@@ -330,10 +332,10 @@ const Inbox = () => {
 
           {/* Ticket list */}
           <div className="flex-1 bg-white dark:bg-[#1b1b1b] overflow-auto">
-            {/* List header */}
-            <div className="grid px-5 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03] items-center" style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}>
+            {/* List header (desktop only) */}
+            <div className="hidden md:grid px-5 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03] items-center" style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr 0.8fr' }}>
               <div />
-              {['Submitter', 'Asset', 'Issue', 'Site', 'Status', 'Priority'].map(h => (
+              {['Submitter', 'Asset', 'Issue', 'Site', 'Status', 'Priority', 'Time'].map(h => (
                 <div key={h} className="text-[12px] font-medium text-gray-300 dark:text-gray-600 uppercase tracking-[0.04em]">{h}</div>
               ))}
             </div>
@@ -350,42 +352,105 @@ const Inbox = () => {
             ) : (
               displayedTickets.map(ticket => {
                 const sla = isSLABreached(ticket.createdAt, ticket.status)
+                const unread = !ticket.isReadByMe
                 return (
                   <div
                     key={ticket.id}
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
-                    className="grid px-5 py-3 border-b border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-blue-50/20 dark:hover:bg-blue-500/5 items-center transition-colors"
-                    style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr' }}
+                    className="border-b border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-blue-50/20 dark:hover:bg-blue-500/5 transition-colors"
                   >
-                    <div onClick={e => { e.stopPropagation(); toggleSelect(ticket.id) }}>
-                      <div className={`w-3.5 h-3.5 rounded border-[1.5px] flex-shrink-0 ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-transparent'}`} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[13px] text-gray-800 dark:text-gray-100 font-medium truncate pr-2">{ticket.fullName}</div>
-                      <div className="text-[11px] text-gray-300 dark:text-gray-600 font-mono">{ticket.ticketCode}</div>
-                    </div>
-                    <div className="text-[12px] text-gray-500 dark:text-gray-400 font-mono truncate pr-2">{assetLabel(ticket)}</div>
-                    <div className="min-w-0">
-                      <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate-pr-2">{ticket.issueType}</div>
-                      {sla && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-full px-1.5 py-0.5 mt-0.5">
-                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          SLA
+                    {/* Desktop row */}
+                    <div className={`hidden md:grid px-5 py-3 items-center transition-all duration 150 ${unread ? 'bg-white hover:bg-[#FAFBFC] dark:bg-[#0f0f0f] dark:hover:bg-[#1B1B1B]' : 
+                      'bg-[#f2f6fc] hover:bg-[#edf2f8] dark:bg-[#262525] dark:hover:bg-[#2d2d2d]'} hover:relative hover:z-10 hover:shadow-[0_1px_3px_rgba(60,64,67,0.20),0_2px_8px_rgba(60,64,67,0.08)] dark:hover:shadow-[0_1px_3px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.35)]`}
+                      style={{ gridTemplateColumns: '24px 2fr 1.3fr 2.2fr 1fr 1fr 1fr 0.8fr' }}>
+                      <div onClick={e => { e.stopPropagation(); toggleSelect(ticket.id) }}>
+                        <div className={`w-3.5 h-3.5 rounded border-[1.5px] flex-shrink-0 ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-transparent'}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[13px] truncate ${unread ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-normal text-gray-500 dark:text-gray-400'}`}>{ticket.fullName}</span>
+                          {unread && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />}
+                        </div>
+                        <div className="text-[11px] text-gray-300 dark:text-gray-600 font-mono">{ticket.ticketCode}</div>
+                      </div>
+                      <div className="text-[12px] text-gray-500 dark:text-gray-400 font-mono truncate pr-2">{assetLabel(ticket)}</div>
+                      <div className="min-w-0">
+                        <div className={`text-[12px] truncate pr-2 ${unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'font-normal text-gray-500 dark:text-gray-400'}`}>{ticket.issueType}</div>
+                        {sla && (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-full px-1.5 py-0.5 mt-0.5">
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            SLA
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.siteName || '—'}</div>
+                      <div className="pr-1.5 pl-1.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_STYLES[ticket.status]}`}>
+                          {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase()}
                         </span>
-                      )}
+                      </div>
+                      <div>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
+                          {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-gray-300 dark:text-gray-600 ">{formatTimeAgo(ticket.createdAt)}</div>
                     </div>
-                    <div className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{ticket.siteName || '—'}</div>
-                    <div className="pr-1.5 pl-1.5">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_STYLES[ticket.status]}`}>
-                        {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
-                        {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
-                      </span>
+
+                    {/* Mobile card — Gmail-style, with select checkbox */}
+                    <div className="md:hidden flex items-start gap-3 px-4 py-3">
+                      <div onClick={e => { e.stopPropagation(); toggleSelect(ticket.id) }} className="pt-1 flex-shrink-0">
+                        <div className={`w-3.5 h-3.5 rounded border-[1.5px] ${selected.has(ticket.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-transparent'}`} />
+                      </div>
+
+                      {/* Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[12px] font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
+                        {initials(ticket.fullName)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Name + ticket code row */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-[13px] truncate ${unread ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-normal text-gray-600 dark:text-gray-400'}`}>
+                            {ticket.fullName}
+                          </span>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className="text-[11px] text-gray-300 dark:text-gray-600 font-mono">{ticket.ticketCode}</span>
+                            {unread && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                          </div>
+                        </div>
+
+                        {/* Subject (issue type) */}
+                        <div className={`text-[12px] truncate mt-0.5 ${unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'font-normal text-gray-500 dark:text-gray-400'}`}>
+                          {ticket.issueType}
+                        </div>
+
+                        {/* Snippet + status/priority badges */}
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <span className="text-[12px] text-gray-400 dark:text-gray-500 truncate">
+                            {assetLabel(ticket)} · {ticket.siteName || '—'}
+                          </span>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_STYLES[ticket.status]}`}>
+                              {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase()}
+                            </span>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${PRIORITY_STYLES[ticket.priority]}`}>
+                              {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {sla && (
+                          <div className="flex items-center gap-1 mt-1 text-[11px] text-red-500 dark:text-red-400">
+                            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            SLA breach
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
