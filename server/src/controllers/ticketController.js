@@ -18,11 +18,11 @@ export const submitTicket = async (req, res) => {
 
     const {
       fullName, email, laptopNumber, desktopNumber, siteName,
-      issueType, customIssue, priority
+      issueType, customIssue, priority, contactNumber
     } = req.body
 
     // Verify laptop exists in DB if provided
-    if (laptopNumber) {
+    if (laptopNumber && laptopNumber !== 'Others') {
       const laptop = await prisma.laptop.findUnique({ where: { assetCode: laptopNumber } })
       if (!laptop || !laptop.active) {
         return res.status(400).json({
@@ -66,6 +66,7 @@ export const submitTicket = async (req, res) => {
         issueType,
         customIssue: customIssue?.trim() || null,
         priority,
+        contactNumber: contactNumber?.trim() || null,
         attachment: attachmentUrl,
         status: 'PENDING'
       }

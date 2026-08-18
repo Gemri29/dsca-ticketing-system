@@ -12,6 +12,7 @@ export const validateEmail = (email) => {
 
 export const validateLaptopNumber = (laptopNumber) => {
   if (!laptopNumber) return null // optional
+  if (laptopNumber == 'Others') return null
   if (!LAPTOP_REGEX.test(laptopNumber)) {
     return 'Invalid laptop number format. Expected: DSCA-IT-L-XXX'
   }
@@ -30,6 +31,10 @@ export const validateTicketFields = (body) => {
   if (laptopError) errors.laptopNumber = laptopError
 
   if (!body.siteName?.trim()) errors.siteName = 'Site name is required.'
+
+  if (!body.contactNumber?.trim() || body.contactNumber.trim() === '+971'){
+    errors.contactNumber =  'Contact number is required and must be valid.'
+  }
 
   if (!body.issueType?.trim()) errors.issueType = 'Issue type is required.'
 

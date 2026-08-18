@@ -181,6 +181,7 @@ const TicketDetail = () => {
                   {[
                     { label: 'Full name', value: ticket.fullName },
                     { label: 'Email', value: ticket.email },
+                    { label: 'Contact Number', value: ticket.contactNumber || '-' },
                     { label: 'Asset', value: ticket.laptopNumber || ticket.desktopNumber || '—', mono: true },
                     { label: 'Site', value: ticket.siteName || '—' },
                     { label: 'Submitted', value: formatDateTime(ticket.createdAt) },

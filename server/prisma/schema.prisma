@@ -23,6 +23,7 @@ model Ticket {
   internalNote String?
   assignedTo   String?
   assignedUser User?    @relation(fields: [assignedTo], references: [id])
+  contactNumber String?
   slaEmailSent Boolean  @default(false)
   reads        TicketRead[]
   createdAt    DateTime @default(now())

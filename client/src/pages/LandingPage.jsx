@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { submitTicket, getLaptops, getDesktops } from '../api/tickets'
 import usePageTitle from '../hooks/usePageTitle'
 
-const ISSUE_TYPES = ['Internet Issue', 'Hardware Issue', 'Software Issue', 'New Email', 'Email reset Password', 'Sim Card Request', 'Server Access', ' CCTV Installation', 'Wifi Installation', 'Printer Maintenance', 'Printer Toner', 'Other']
+const ISSUE_TYPES = ['Internet Issue', 'Hardware Issue', 'Software Issue', 'New Email', 'Email reset Password', 'Sim Card Request', 'Server Access', 'CCTV Installation', 'Wifi Installation', 'Printer Maintenance', 'Printer Toner', 'Other']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
 const LandingPage = () => {
@@ -24,6 +24,7 @@ const LandingPage = () => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
+    contactNumber: '+971 ',
     siteName: '',
     issueType: '',
     customIssue: '',
@@ -102,6 +103,7 @@ const LandingPage = () => {
     if (selectedLaptop) data.append('laptopNumber', selectedLaptop)
     if (selectedDesktop) data.append('desktopNumber', selectedDesktop)
     data.append('siteName', form.siteName)
+    data.append('contactNumber', form.contactNumber)
     data.append('issueType', form.issueType)
     data.append('customIssue', form.customIssue)
     data.append('priority', form.priority)
@@ -154,7 +156,7 @@ const LandingPage = () => {
                 Track ticket
               </button>
               <button
-                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', siteName: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null); setSelectedDesktop(null) }}
+                onClick={() => { setSubmitted(null); setForm({ fullName: '', email: '', contactNumber: '+971 ' , siteName: '', issueType: '', customIssue: '', priority: 'MEDIUM', attachment: null, _trap: '' }); setSelectedLaptop(null); setSelectedDesktop(null) }}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700"
               >
                 Submit another
@@ -205,8 +207,7 @@ const LandingPage = () => {
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               />
             </div>
-
-            {/* Email */}
+           {/* Email */}
             <div>
               <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email</label>
               <input
@@ -218,9 +219,23 @@ const LandingPage = () => {
               />
             </div>
 
+            {/* Contact number */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                Contact number <span className="text-gray-300 normal-case"></span>
+              </label>
+              <input
+                type="tel" name="contactNumber" value={form.contactNumber}
+                onChange={handleChange} required
+                placeholder="e.g. +971 50 123 4567"
+                maxLength={14}
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
             {/* Laptop number combobox */}
             <div className={selectedDesktop ? 'opacity-40 pointer-events-none' : ''}>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Laptop number <span className="text-gray-300 normal-case">(if available)</span></label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Laptop number <span className="text-gray-300 normal-case">(if not available, select 'Others')</span></label>
               {selectedLaptop ? (
                 <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                   <span className="text-sm text-blue-700 font-medium flex-1">{selectedLaptop}</span>
@@ -252,6 +267,10 @@ const LandingPage = () => {
                           </div>
                         ))
                       )}
+                      <div onMouseDown={() => { setSelectedLaptop('Others'); setLaptopQuery(''); setLaptopDropdownOpen(false) }}
+                      className="px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 cursor-pointer border-t border-gray-100 italic">
+                      Others
+                    </div>
                     </div>
                   )}
                 </div>
