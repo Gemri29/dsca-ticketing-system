@@ -176,7 +176,7 @@ const LoginPage = () => {
               disabled={submitting}
               className="w-full py-2.5 rounded-lg bg-blue-600 text-white text-[14px] font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all mb-4"
             >
-              {submitting ? 'Signing in...' : 'Sign in ↗'}
+              {submitting ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
 

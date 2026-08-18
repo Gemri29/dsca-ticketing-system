@@ -329,17 +329,30 @@ const LandingPage = () => {
               />
             </div>
 
-            {/* Issue type */}
-            <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Issue type</label>
+            <div className="relative">
               <select
-                name="issueType" value={form.issueType}
-                onChange={handleChange} required
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
+                name="issueType"
+                value={form.issueType}
+                onChange={handleChange}
+                required
+                className="w-full appearance-none px-3 py-2 pr-10 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:border-blue-500"
               >
                 <option value="">Select issue</option>
-                {ISSUE_TYPES.map(i => <option key={i}>{i}</option>)}
+                {ISSUE_TYPES.map(i => (
+                  <option key={i}>{i}</option>
+                ))}
               </select>
+              <svg
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
 
             {/* Sim Card Request notice */}
@@ -422,7 +435,7 @@ const LandingPage = () => {
               onClick={() => navigate('/track')}
               className="w-full py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
             >
-              Go to ticket tracker →
+              Go to ticket tracker
             </button>
           </div>
 
