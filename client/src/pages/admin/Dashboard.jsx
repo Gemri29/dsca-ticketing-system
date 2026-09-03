@@ -9,6 +9,7 @@ import useDarkMode from '../../hooks/useDarkMode'
 import { priorityStyles as PRIORITY_STYLES } from '../../components/PriorityBadge'
 
 const STATUS_FILTERS = ['PENDING', 'UNRESOLVED', 'RESOLVED']
+const PAGE_SIZE = 25
 
 const STAT_CONFIG = {
   PENDING: { label: 'Pending', numColor: 'text-orange-500', iconBg: 'bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400' },
@@ -46,6 +47,8 @@ const Dashboard = () => {
     STATUS_FILTERS.includes(initialStatus) ? initialStatus : 'PENDING'
   )
   const [tickets, setTickets] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
   const [counts, setCounts] = useState({ PENDING: 0, UNRESOLVED: 0, RESOLVED: 0 })
   const [loading, setLoading] = useState(true)
 
@@ -73,26 +76,30 @@ const Dashboard = () => {
     const fetchTickets = async () => {
       setLoading(true)
       try {
-        const res = await getTickets({ status: activeFilter, limit: 25, sortBy: 'createdAt', order: 'desc' })
+        const res = await getTickets({ status: activeFilter, limit: PAGE_SIZE, page, sortBy: 'createdAt', order: 'desc' })
         setTickets(res.tickets)
+        setTotal(res.pagination.total)
       } catch {
         setTickets([])
+        setTotal(0)
       } finally {
         setLoading(false)
       }
     }
     fetchTickets()
-  }, [activeFilter])
+  }, [activeFilter, page])
 
   useEffect(() => {
     const status = searchParams.get('status')?.toUpperCase()
     if (status && STATUS_FILTERS.includes(status)) {
       setActiveFilter(status)
+      setPage(1)
     }
   }, [searchParams])
 
   const setFilter = (status) => {
     setActiveFilter(status)
+    setPage(1)
     setSearchParams({ status: status.toLowerCase() })
   }
 
@@ -108,6 +115,8 @@ const Dashboard = () => {
   const assetLabel = (t) => t.laptopNumber || t.desktopNumber || '—'
 
   const initials = (name) => name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?'
+
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f7f8fa] dark:bg-[#1b1b1b]">
@@ -276,7 +285,6 @@ const Dashboard = () => {
 
                     {/* Mobile card — Gmail-style */}
                     <div className="md:hidden flex items-start gap-3 px-4 py-3">
-                      
                       {/* Avatar */}
                       <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-[12px] font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
                         {initials(ticket.fullName)}
@@ -324,6 +332,38 @@ const Dashboard = () => {
               })
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.03] text-[12px] text-gray-400 dark:text-gray-500 flex-shrink-0">
+              <span>Showing {Math.min((page - 1) * PAGE_SIZE + 1, total)}–{Math.min(page * PAGE_SIZE, total)} of {total}</span>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-white/10"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`px-2.5 py-1 rounded-md border text-[12px] ${page === p ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-white/10"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

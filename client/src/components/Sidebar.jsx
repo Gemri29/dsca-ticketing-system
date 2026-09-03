@@ -214,7 +214,7 @@ const Sidebar = ({ counts = {} }) => {
     <>
       {/* ── Desktop sidebar ─────────────────────── */}
       <div
-        className="hidden md:flex flex-col bg-white dark:bg-[#1b1b1b] border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-all duration-200"
+        className="hidden md:flex flex-col bg-white dark:bg-[#1b1b1b] border-r border-gray-200 dark:border-gray-800 flex-shrink-0 transition-[width] duration-200"
         style={{ width: collapsed ? 52 : 220 }}
       >
         <SidebarContent />
