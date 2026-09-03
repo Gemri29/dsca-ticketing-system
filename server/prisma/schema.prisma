@@ -26,6 +26,7 @@ model Ticket {
   contactNumber String?
   slaEmailSent Boolean  @default(false)
   reads        TicketRead[]
+  activities   TicketActivity[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -39,6 +40,7 @@ model User {
   active          Boolean  @default(true)
   assignedTickets Ticket[]
   ticketReads     TicketRead[]
+  ticketActivities TicketActivity[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -53,6 +55,21 @@ model TicketRead {
 
   @@unique([ticketId, adminId])
   @@index([adminId])
+}
+
+// Audit trail — one row per meaningful change to a ticket (status change, assignment, or generic update)
+model TicketActivity {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  actorName String   // denormalized snapshot — keeps the log readable even if the admin account is later deleted/deactivated
+  action    String   // 'STATUS_CHANGE' | 'ASSIGNED' | 'UPDATED'
+  detail    String   // human-readable description, e.g. "Status changed from PENDING to RESOLVED"
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
 }
 
 model Laptop {

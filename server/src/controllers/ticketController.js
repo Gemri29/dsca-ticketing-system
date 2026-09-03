@@ -88,13 +88,14 @@ export const submitTicket = async (req, res) => {
     } catch (emailErr) {
       console.error('Confirmation email failed:', emailErr)
     }
-    
+
     // Notify all active admins
     try {
       const admins = await prisma.user.findMany({
         where: { active: true },
         select: { email: true, name: true }
       })
+
       await Promise.allSettled(
         admins.map(admin =>
           sendTicketAssignedEmail({
@@ -207,12 +208,12 @@ export const getTickets = async (req, res) => {
       }),
       prisma.ticket.count({ where })
     ])
-  
+
     const ticketsWithReadState = tickets.map(({ reads, ...t }) => ({
       ...t,
       isReadByMe: reads.length > 0
     }))
-  
+
     return res.status(200).json({
       success: true,
       tickets: ticketsWithReadState,
@@ -241,6 +242,9 @@ export const getTicketById = async (req, res) => {
       include: {
         assignedUser: {
           select: { id: true, name: true, email: true }
+        },
+        activities: {
+          orderBy: { createdAt: 'asc' }
         }
       }
     })
@@ -287,8 +291,46 @@ export const updateTicket = async (req, res) => {
       data: updateData
     })
 
+    const statusChanged = status && status.toUpperCase() !== ticket.status
+    const remarkChanged = remark !== undefined && remark !== ticket.remark
+    const noteChanged = internalNote !== undefined && internalNote !== ticket.internalNote
+
+    // Log activity: status change gets its own entry
+    if (statusChanged) {
+      try {
+        await prisma.ticketActivity.create({
+          data: {
+            ticketId: id,
+            actorId: req.user.id,
+            actorName: req.user.name,
+            action: 'STATUS_CHANGE',
+            detail: `Status changed from ${ticket.status} to ${updated.status}`
+          }
+        })
+      } catch (logErr) {
+        console.error('TicketActivity (status) log failed:', logErr)
+      }
+    }
+
+    // Log activity: remark/internal note edits fold into one generic entry
+    if (remarkChanged || noteChanged) {
+      try {
+        await prisma.ticketActivity.create({
+          data: {
+            ticketId: id,
+            actorId: req.user.id,
+            actorName: req.user.name,
+            action: 'UPDATED',
+            detail: 'Ticket updated'
+          }
+        })
+      } catch (logErr) {
+        console.error('TicketActivity (update) log failed:', logErr)
+      }
+    }
+
     // Send status update email if status changed
-    if (status && status.toUpperCase() !== ticket.status) {
+    if (statusChanged) {
       try {
         await sendStatusUpdateEmail({
           to: ticket.email,
@@ -349,6 +391,20 @@ export const assignTicket = async (req, res) => {
         assignedUser: { select: { id: true, name: true } }
       }
     })
+
+    try {
+      await prisma.ticketActivity.create({
+        data: {
+          ticketId: id,
+          actorId: req.user.id,
+          actorName: req.user.name,
+          action: 'ASSIGNED',
+          detail: `Assigned to ${admin.name}`
+        }
+      })
+    } catch (logErr) {
+      console.error('TicketActivity (assign) log failed:', logErr)
+    }
 
     return res.status(200).json({
       success: true,

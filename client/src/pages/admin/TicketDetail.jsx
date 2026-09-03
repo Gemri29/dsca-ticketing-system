@@ -11,6 +11,12 @@ import { formatDateTime, formatTimeAgo, isSLABreached } from '../../utils/format
 import usePageTitle from '../../hooks/usePageTitle'
 import useDarkMode from '../../hooks/useDarkMode'
 
+const ACTIVITY_COLORS = {
+  STATUS_CHANGE: 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/30',
+  ASSIGNED: 'bg-purple-50 border-purple-200 dark:bg-purple-500/10 dark:border-purple-500/30',
+  UPDATED: 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-gray-700'
+}
+
 const TicketDetail = () => {
   usePageTitle('Ticket Detail')
   const { id } = useParams()
@@ -65,6 +71,9 @@ const TicketDetail = () => {
       setInternalNote(res.ticket.internalNote || '')
       setNewNote('')
       toast.success('Ticket updated successfully.')
+      // Re-fetch so the activity timeline picks up the new log entries
+      const refreshed = await getTicketById(id)
+      setTicket(refreshed.ticket)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update ticket.')
     } finally {
@@ -77,6 +86,9 @@ const TicketDetail = () => {
       await assignTicket(id, adminId)
       setAssignedTo(adminId)
       toast.success('Ticket reassigned.')
+      // Re-fetch so the activity timeline picks up the new log entry
+      const refreshed = await getTicketById(id)
+      setTicket(refreshed.ticket)
     } catch (err) {
       toast.error('Failed to reassign ticket.')
     }
@@ -93,6 +105,9 @@ const TicketDetail = () => {
       setTicket(prev => ({ ...prev, ...res.ticket }))
       setStatus('RESOLVED')
       toast.success('Ticket marked as resolved.')
+      // Re-fetch so the activity timeline picks up the new log entry
+      const refreshed = await getTicketById(id)
+      setTicket(refreshed.ticket)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to resolve ticket.')
     } finally {
@@ -108,6 +123,24 @@ const TicketDetail = () => {
     { value: 'RESOLVED', label: 'Resolved', active: 'border-green-400 text-green-600 bg-green-50 dark:border-green-500/50 dark:text-green-400 dark:bg-green-500/10' }
   ]
 
+  const DarkModeToggle = () => (
+    <button
+      onClick={toggle}
+      className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+      aria-label="Toggle dark mode"
+    >
+      {isDark ? (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ) : (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      )}
+    </button>
+  )
+
   if (loading) {
     return (
       <div className="flex h-screen bg-gray-50 dark:bg-[#1b1b1b]">
@@ -118,6 +151,17 @@ const TicketDetail = () => {
       </div>
     )
   }
+
+  // Build the timeline: static "submitted" entry, then the real logged activities, then a computed SLA warning if applicable
+  const timelineItems = [
+    { text: `Ticket submitted by ${ticket.fullName}`, time: ticket.createdAt },
+    ...(ticket.activities || []).map(a => ({
+      text: `${a.detail} — ${a.actorName}`,
+      time: a.createdAt,
+      color: ACTIVITY_COLORS[a.action] || ACTIVITY_COLORS.UPDATED
+    })),
+    slaBreached && { text: 'SLA threshold exceeded — 48 hours passed', time: null, color: 'bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/30', red: true }
+  ].filter(Boolean)
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-[#1b1b1b] overflow-hidden">
@@ -130,27 +174,12 @@ const TicketDetail = () => {
             onClick={() => navigate(-1)}
             className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 pl-6"
           >
-             Back
+            Back
           </button>
           <span className="text-gray-200 dark:text-gray-700">/</span>
           <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{ticket.ticketCode}</span>
           <div className="ml-auto flex items-center gap-2">
-            {/* Dark mode toggle */}
-            <button
-              onClick={toggle}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {isDark ? (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              )}
-            </button>
+            <DarkModeToggle />
 
             <StatusBadge status={ticket.status} />
             <PriorityBadge priority={ticket.priority} />
@@ -242,14 +271,9 @@ const TicketDetail = () => {
               <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
                 <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">Activity timeline</h3>
                 <div className="space-y-4">
-                  {[
-                    { text: `Ticket submitted by ${ticket.fullName}`, time: ticket.createdAt },
-                    ticket.assignedUser && { text: `Assigned to ${ticket.assignedUser.name}`, time: ticket.updatedAt, color: 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/30' },
-                    ticket.internalNote && { text: 'Internal note added', time: ticket.updatedAt, color: 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-gray-700' },
-                    slaBreached && { text: 'SLA threshold exceeded — 48 hours passed', time: null, color: 'bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/30', red: true }
-                  ].filter(Boolean).map((item, i) => (
+                  {timelineItems.map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className={`w-7 h-7 rounded-full border flex items-center justify-center text-sm flex-shrink-0 ${item.color}`}>
+                      <div className={`w-7 h-7 rounded-full border flex items-center justify-center text-sm flex-shrink-0 ${item.color || 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-gray-700'}`}>
                         {item.icon}
                       </div>
                       <div>
