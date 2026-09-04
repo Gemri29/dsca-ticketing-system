@@ -143,11 +143,11 @@ export const sendSLABreachEmail = async ({ to, adminName, ticketCode, fullName, 
   await resend.emails.send({
     from: process.env.EMAIL_FROM,
     to,
-    subject: `⚠️ [${ticketCode}] SLA Breach — Immediate attention required`,
+    subject: `[${ticketCode}] SLA Breach — Immediate attention required`,
     html: `
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
         <div style="background:#ef4444;padding:24px 32px;border-radius:12px 12px 0 0">
-          <h1 style="color:#fff;margin:0;font-size:20px">⚠️ SLA Breach Alert</h1>
+          <h1 style="color:#fff;margin:0;font-size:20px">SLA Breach Alert</h1>
         </div>
         <div style="background:#fff8f8;padding:32px;border:1px solid #fecaca;border-top:none;border-radius:0 0 12px 12px">
           <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
@@ -216,7 +216,7 @@ export const sendSLADigestEmail = async ({ to, adminName, tickets }) => {
   await resend.emails.send({
     from: process.env.EMAIL_FROM,
     to,
-    subject: `⚠️ Daily SLA Breach Digest — ${tickets.length} ticket${tickets.length === 1 ? '' : 's'} overdue`,
+    subject: `Daily SLA Breach Digest — ${tickets.length} ticket${tickets.length === 1 ? '' : 's'} overdue`,
     html: `
       <div style="font-family:sans-serif;max-width:680px;margin:0 auto;color:#1a1a1a">
         <div style="background:#ef4444;padding:24px 32px;border-radius:12px 12px 0 0">
