@@ -9,7 +9,7 @@ import useDarkMode from '../../hooks/useDarkMode'
 import { priorityStyles as PRIORITY_STYLES } from '../../components/PriorityBadge'
 
 const STATUS_FILTERS = ['PENDING', 'UNRESOLVED', 'RESOLVED']
-const PAGE_SIZE = 10
+const PAGE_SIZE = 12
 
 const STAT_CONFIG = {
   PENDING: { label: 'Pending', numColor: 'text-orange-500', iconBg: 'bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400' },
