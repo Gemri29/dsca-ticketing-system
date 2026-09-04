@@ -84,9 +84,9 @@ export const sendStatusUpdateEmail = async ({ to, fullName, ticketCode, status, 
               ${status}
             </span>
             ${remark ? `
-            <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0"/>
-            <p style="margin:0 0 6px;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em">Remark from IT team</p>
-            <p style="margin:0;font-size:13px;color:#1a1a1a">${remark}</p>
+              <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0"/>
+              <p style="margin:0 0 6px;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em">Remark from IT team</p>
+              <p style="margin:0;font-size:13px;color:#1a1a1a">${remark}</p>
             ` : ''}
           </div>
 
@@ -98,6 +98,7 @@ export const sendStatusUpdateEmail = async ({ to, fullName, ticketCode, status, 
     `
   })
 }
+
 export const sendTicketAssignedEmail = async ({ to, adminName, ticketCode, fullName, issueType, customIssue, priority, siteLocation, ticketId }) => {
   const ticketUrl = `${process.env.FRONTEND_URL}/admin/tickets/${ticketId}`
   const issueDisplay = issueType === 'Other' && customIssue ? `Other — ${customIssue}` : issueType
@@ -151,7 +152,7 @@ export const sendSLABreachEmail = async ({ to, adminName, ticketCode, fullName, 
         <div style="background:#fff8f8;padding:32px;border:1px solid #fecaca;border-top:none;border-radius:0 0 12px 12px">
           <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
           <p style="margin:0 0 24px;color:#555">
-            A ticket has exceeded the <strong>48-hour SLA threshold</strong> 
+            A ticket has exceeded the <strong>48-hour SLA threshold</strong>
             and has been open for <strong>${hoursElapsed} hours</strong> without resolution.
           </p>
           <div style="background:#fff;border:1px solid #fecaca;border-radius:8px;padding:20px;margin-bottom:24px">
@@ -169,6 +170,86 @@ export const sendSLABreachEmail = async ({ to, adminName, ticketCode, fullName, 
           </div>
           <a href="${ticketUrl}" style="display:block;text-align:center;background:#ef4444;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:500">
             Resolve ticket now →
+          </a>
+        </div>
+      </div>
+    `
+  })
+}
+
+// One email per admin, listing every currently-breached ticket in a single table —
+// replaces the old one-email-per-ticket-per-admin approach from sendSLABreachEmail above.
+export const sendSLADigestEmail = async ({ to, adminName, tickets }) => {
+  const priorityColors = {
+    CRITICAL: '#ef4444',
+    HIGH: '#ea580c',
+    MEDIUM: '#ca8a04',
+    LOW: '#6b7280'
+  }
+
+  const dashboardUrl = `${process.env.FRONTEND_URL}/admin/inbox`
+
+  const rows = tickets.map(t => {
+    const asset = t.laptopNumber || t.desktopNumber || '—'
+    const issueDisplay = t.issueType === 'Other' && t.customIssue ? `Other — ${t.customIssue}` : t.issueType
+    const ticketUrl = `${process.env.FRONTEND_URL}/admin/tickets/${t.ticketId}`
+    const color = priorityColors[t.priority] || '#6b7280'
+
+    return `
+      <tr style="border-bottom:1px solid #fee2e2">
+        <td style="padding:8px;font-size:12px">${t.fullName}</td>
+        <td style="padding:8px;font-size:12px">
+          <a href="${ticketUrl}" style="color:#ef4444;font-weight:600;text-decoration:none">${t.ticketCode}</a>
+        </td>
+        <td style="padding:8px;font-size:12px;font-family:monospace">${asset}</td>
+        <td style="padding:8px;font-size:12px">${issueDisplay}</td>
+        <td style="padding:8px;font-size:12px">
+          <span style="display:inline-block;padding:2px 8px;border-radius:10px;background:${color}20;color:${color};font-weight:600;font-size:11px">
+            ${t.priority}
+          </span>
+        </td>
+        <td style="padding:8px;font-size:12px;color:#ef4444;font-weight:600">${t.hoursElapsed}h</td>
+      </tr>
+    `
+  }).join('')
+
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: `⚠️ Daily SLA Breach Digest — ${tickets.length} ticket${tickets.length === 1 ? '' : 's'} overdue`,
+    html: `
+      <div style="font-family:sans-serif;max-width:680px;margin:0 auto;color:#1a1a1a">
+        <div style="background:#ef4444;padding:24px 32px;border-radius:12px 12px 0 0">
+          <h1 style="color:#fff;margin:0;font-size:20px">⚠️ Daily SLA Breach Digest</h1>
+        </div>
+        <div style="background:#fff8f8;padding:32px;border:1px solid #fecaca;border-top:none;border-radius:0 0 12px 12px">
+          <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
+          <p style="margin:0 0 24px;color:#555">
+            <strong>${tickets.length}</strong> ticket${tickets.length === 1 ? '' : 's'}
+            ${tickets.length === 1 ? 'has' : 'have'} exceeded the 48-hour SLA threshold and remain unresolved.
+            Sorted by priority.
+          </p>
+
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr style="background:#fef2f2">
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Submitter</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Ticket #</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Asset</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Issue</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Priority</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #fecaca;color:#991b1b;font-size:11px;text-transform:uppercase">Overdue</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          </div>
+
+          <a href="${dashboardUrl}" style="display:block;text-align:center;background:#ef4444;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:500;margin-top:24px">
+            View all breached tickets →
           </a>
         </div>
       </div>

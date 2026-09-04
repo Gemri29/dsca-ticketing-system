@@ -24,7 +24,7 @@ model Ticket {
   assignedTo   String?
   assignedUser User?    @relation(fields: [assignedTo], references: [id])
   contactNumber String?
-  slaEmailSent Boolean  @default(false)
+  lastSlaEmailAt DateTime?
   reads        TicketRead[]
   activities   TicketActivity[]
   createdAt    DateTime @default(now())

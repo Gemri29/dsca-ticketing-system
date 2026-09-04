@@ -2,9 +2,7 @@ import prisma from '../utils/prismaClient.js'
 import bcrypt from 'bcrypt'
 import { validatePasswordStrength } from '../utils/validators.js'
 
-// ─────────────────────────────────────────────
 // SUPER ADMIN — GET /api/admin/users
-// ─────────────────────────────────────────────
 export const getAdminUsers = async (req, res) => {
   const { active, role } = req.query
 
@@ -36,9 +34,7 @@ export const getAdminUsers = async (req, res) => {
   }
 }
 
-// ─────────────────────────────────────────────
 // SUPER ADMIN — POST /api/admin/users
-// ─────────────────────────────────────────────
 export const createAdminUser = async (req, res) => {
   const { name, email, password, role } = req.body
 
