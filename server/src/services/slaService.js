@@ -6,12 +6,12 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const SLA_HOURS = parseInt(process.env.SLA_THRESHOLD_HOURS) || 48
-const REMINDER_INTERVAL_HOURS = 24
+const REMINDER_INTERVAL_HOURS = 23
 const PRIORITY_WEIGHT = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
 
 // Extracted so it can be called both by the daily cron AND manually (e.g. an admin test-trigger route)
 export const runSLABreachCheck = async () => {
-  console.log('⏰ Running SLA breach check...')
+  console.log('Running SLA breach check...')
 
   try {
     const breachThreshold = new Date(Date.now() - SLA_HOURS * 60 * 60 * 1000)
@@ -78,7 +78,7 @@ export const runSLABreachCheck = async () => {
       if (result.status === 'fulfilled') {
         emailedCount++
       } else {
-        console.error(`❌ SLA digest failed for ${admins[i].email}:`, result.reason)
+        console.error(`SLA digest failed for ${admins[i].email}:`, result.reason)
       }
     })
 
@@ -88,7 +88,7 @@ export const runSLABreachCheck = async () => {
       data: { lastSlaEmailAt: new Date() }
     })
 
-    console.log(`✅ SLA digest sent to ${emailedCount}/${admins.length} admin(s), covering ${digestTickets.length} ticket(s)`)
+    console.log(`SLA digest sent to ${emailedCount}/${admins.length} admin(s), covering ${digestTickets.length} ticket(s)`)
 
     return { checked: breachedTickets.length, emailed: emailedCount }
   } catch (err) {
@@ -105,5 +105,5 @@ export const startSLACronJob = () => {
     timezone: 'Asia/Dubai'
   })
 
-  console.log('✅ SLA breach cron job started — runs daily at 8:00 AM (Asia/Dubai), digest repeats every 24h until resolved')
+  console.log('SLA breach cron job started — runs daily at 8:00 AM (Asia/Dubai), digest repeats every 24h until resolved')
 }

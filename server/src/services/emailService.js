@@ -220,7 +220,7 @@ export const sendSLADigestEmail = async ({ to, adminName, tickets }) => {
     html: `
       <div style="font-family:sans-serif;max-width:680px;margin:0 auto;color:#1a1a1a">
         <div style="background:#ef4444;padding:24px 32px;border-radius:12px 12px 0 0">
-          <h1 style="color:#fff;margin:0;font-size:20px">⚠️ Daily SLA Breach Digest</h1>
+          <h1 style="color:#fff;margin:0;font-size:20px">Daily SLA Breach Digest</h1>
         </div>
         <div style="background:#fff8f8;padding:32px;border:1px solid #fecaca;border-top:none;border-radius:0 0 12px 12px">
           <p style="margin:0 0 16px">Hi <strong>${adminName}</strong>,</p>
