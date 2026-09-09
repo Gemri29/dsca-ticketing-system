@@ -88,6 +88,18 @@ model Desktop {
   createdAt    DateTime @default(now())
 }
 
+// Guarantees the daily SLA digest only ever runs once per calendar day,
+// even if Railway briefly runs more than one instance (extra replicas,
+// or a deploy overlapping old/new instances right at the scheduled time).
+// Whichever instance runs first "claims" today's date via the unique
+// constraint below — any other instance trying the same insert gets a
+// database-enforced conflict and skips, atomically, no race condition possible.
+model SlaDigestRun {
+  id      String @id @default(cuid())
+  runDate String @unique // "YYYY-MM-DD" in Asia/Dubai time
+  ranAt   DateTime @default(now())
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN

@@ -6,19 +6,50 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const SLA_HOURS = parseInt(process.env.SLA_THRESHOLD_HOURS) || 48
+// Slightly under 24h on purpose — a daily cron doesn't fire at the exact same
+// millisecond every day (normal jitter), so gating on a razor-exact 24h window
+// can silently skip a day if that day's run lands even a few seconds early
+// relative to the previous stamp. This buffer absorbs that without meaningfully
+// changing the "roughly once a day" cadence.
 const REMINDER_INTERVAL_HOURS = 23
 const PRIORITY_WEIGHT = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
 
-// Extracted so it can be called both by the daily cron AND manually (e.g. an admin test-trigger route)
-export const runSLABreachCheck = async () => {
+// Today's calendar date in Asia/Dubai, as "YYYY-MM-DD" — independent of
+// whatever timezone the underlying server/container actually runs in.
+const getTodayDubaiDateString = () =>
+  new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' })
+
+// Extracted so it can be called both by the daily cron AND manually for testing.
+// `force: true` bypasses the once-per-day guard (useful for manual re-testing —
+// otherwise you'd have to delete today's SlaDigestRun row first).
+export const runSLABreachCheck = async ({ force = false } = {}) => {
   console.log('Running SLA breach check...')
+
+  const today = getTodayDubaiDateString()
+
+  if (!force) {
+    // Atomically "claim" today's run. If another instance already claimed it
+    // (extra Railway replica, or a deploy overlapping the old/new instance
+    // right at 8am), this insert hits the unique constraint and throws —
+    // we catch that specific case and skip cleanly instead of sending a
+    // duplicate digest.
+    try {
+      await prisma.slaDigestRun.create({ data: { runDate: today } })
+    } catch (err) {
+      if (err.code === 'P2002') {
+        console.log(`SLA digest already ran today (${today}) — skipping duplicate run`)
+        return { checked: 0, emailed: 0, skipped: true }
+      }
+      throw err
+    }
+  }
 
   try {
     const breachThreshold = new Date(Date.now() - SLA_HOURS * 60 * 60 * 1000)
     const reminderThreshold = new Date(Date.now() - REMINDER_INTERVAL_HOURS * 60 * 60 * 1000)
 
     // Find tickets that are breached, not resolved, and either
-    // never had a reminder sent, or their last reminder was 24+ hours ago.
+    // never had a reminder sent, or their last reminder was 23+ hours ago.
     const breachedTickets = await prisma.ticket.findMany({
       where: {
         status: { not: 'RESOLVED' },
@@ -105,5 +136,5 @@ export const startSLACronJob = () => {
     timezone: 'Asia/Dubai'
   })
 
-  console.log('SLA breach cron job started — runs daily at 8:00 AM (Asia/Dubai), digest repeats every 24h until resolved')
+  console.log('SLA breach cron job started — runs daily at 8:00 AM (Asia/Dubai), digest repeats every 24h until resolved, guarded against duplicate runs')
 }
