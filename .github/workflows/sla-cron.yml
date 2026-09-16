@@ -1,0 +1,16 @@
+name: Trigger Daily SLA Check
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger-sla-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call SLA check endpoint
+        run: |
+          curl -f "https://determined-appreciation-production-528e.up.railway.app/api/cron/sla-check?secret=${{ secrets.CRON_SECRET }}"
+
+        

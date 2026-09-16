@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/auth.js'
 import ticketRoutes from './routes/tickets.js'
 import adminRoutes from './routes/admin.js'
+import cronRoutes from './routes/cron.js'
 import { startSLACronJob } from './services/slaService.js'
 
 dotenv.config()
@@ -14,6 +15,7 @@ dotenv.config()
 const app = express()
 
 app.set('trust proxy', 1) // Trust first proxy (for secure cookies behind a reverse proxy)
+
 // ── Security middleware ──────────────────────────────────────
 app.use(helmet())
 app.use(cors({
@@ -30,6 +32,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use('/api/auth', authRoutes)
 app.use('/api/tickets', ticketRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/cron', cronRoutes)
 
 // ── Health check ─────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -46,6 +49,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({ success: false, message: 'Internal server error.' })
 })
+
 // Start SLA breach monitoring
 startSLACronJob()
 
