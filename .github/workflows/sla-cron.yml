@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Call SLA check endpoint
         run: |
-          curl -f "https://determined-appreciation-production-528e.up.railway.app/api/cron/sla-check?secret=${{ secrets.CRON_SECRET }}"
+          curl -H "x-cron-key: ${{ secrets.CRON_SECRET }}" "https://determined-appreciation-production-528e.up.railway.app/api/cron/sla-check"
 
         
